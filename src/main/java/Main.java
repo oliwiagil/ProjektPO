@@ -29,6 +29,9 @@ public class Main extends Application {
     ArrayList<Bullet> bullets=new ArrayList<>();
     ArrayList<Enemy> enemys=new ArrayList<>();
 
+    //zmienne odpowiedzialne za to zeby nie mozliwe bylo strzelanie jednym ciagiem
+    boolean canShot=true;
+    int time;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -51,8 +54,14 @@ public class Main extends Application {
             @Override
             public void handle(KeyEvent wcisnieto) {
                 if(wcisnieto.getCode()==KeyCode.ESCAPE){System.exit(0);}
-                if(wcisnieto.getCode() == KeyCode.SPACE){gracz.shot();}
-                else if (wcisnieto.getCode() == KeyCode.LEFT || wcisnieto.getCode() == KeyCode.A) {
+                //tylko gdy minal odpowiednio dlugi czas od ostatniego strzalu mozliwy jest strzal
+                if(canShot) {
+                    if (wcisnieto.getCode() == KeyCode.SPACE) {
+                        gracz.shot();
+                        canShot=false;
+                    }
+                }
+                if (wcisnieto.getCode() == KeyCode.LEFT || wcisnieto.getCode() == KeyCode.A) {
                     gracz.moveA();
                 } else if (wcisnieto.getCode() == KeyCode.RIGHT || wcisnieto.getCode() == KeyCode.D) {
                     gracz.moveD();
@@ -68,6 +77,15 @@ public class Main extends Application {
                         Duration.millis(SPEED),
                         event -> {
                             ruch();
+                            //po odpowiednim czasie umozliwia kolejny strzal
+                            if(!canShot) {
+                                time++;
+                                if(time%8==0){
+                                    time=0;
+                                    canShot=true;
+                                }
+                            }
+
                         }
                 )
         );
@@ -77,21 +95,39 @@ public class Main extends Application {
     }
 
     void ruch(){
+        ArrayList<Bullet> removeB=new ArrayList<>();
+        ArrayList<Enemy> removeE=new ArrayList<>();
         //przemieszcza pociski statku
         for(Bullet i : bullets){
-            i.moveUp();
-            for(Enemy j : enemys){
-                if (i.getBoundsInParent().intersects(j.getBoundsInParent())) {
-                    j.setVisible(false);
-                    i.setVisible(false);
+            if(i.moveUp()) {
+                for (Enemy j : enemys) {
+                    //jezeli jakis pocisk trafil przeciwnika
+                    if (i.getBoundsInParent().intersects(j.getBoundsInParent())) {
+                        //ukrywam pocisk i przeciwnika
+                        j.setVisible(false);
+                        i.setVisible(false);
+                        //dodaje do listy elementow do usuniecia
+                        removeB.add(i);
+                        removeE.add(j);
+                    }
                 }
             }
+            //pocisk wyszedl poza plansze wiec jest usuwany
+            else{removeB.add(i);}
         }
+        //usuwam wszystkie elementy ktore w tym ruchu zostaly trafione
+        bullets.removeAll(removeB);
+        enemys.removeAll(removeE);
+    //    System.out.println(bullets.size());
     }
 
     void createEnemys(){
-        for(double i=10;i<WIDTH;i=i+50){
-            gamePane.getChildren().add(new Enemy(i,30));
+        //liczba rzedow przeciwnikow
+        int k=4;
+        for(double j=30;j<k*30;j=j+30) {
+            for (double i = 10; i < WIDTH; i = i + 50) {
+                gamePane.getChildren().add(new Enemy(i, j));
+            }
         }
     }
 
@@ -147,6 +183,7 @@ public class Main extends Application {
     }
 
     public class Bullet extends Rectangle{
+        boolean delete=false;
         //obecna wysokosc pocisku
         double currentY;
         //jednostaka o jaka sie przemieszcza
@@ -162,12 +199,14 @@ public class Main extends Application {
             gamePane.getChildren().add(this);
         }
         //jak statek strzela do gory
-        void moveUp(){
+        boolean moveUp(){
             if(currentY-move+20>=0) {
                 currentY -= move;
                 setTranslateY(currentY);
+                return true;
             }
-            //  else{bullets.remove(this);}
+            //zwracam false jesli pocisk wyszedl poza plansze i jest do usuniecia w ruch()
+            else{return false;}
         }
         //jak przeciwnicy strzelaja w dol
         void moveDown(){
