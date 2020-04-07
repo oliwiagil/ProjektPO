@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 public class Main extends Application {
     public int WIDTH=400;
-    public int HEIGHT=600;
+    public int HEIGHT=400;
     private int SPEED=30;
     public Color TLO =Color.WHITE;
 
@@ -27,6 +27,7 @@ public class Main extends Application {
     EventHandler<KeyEvent> eventHandler;
     Ship gracz;
     ArrayList<Bullet> bullets=new ArrayList<>();
+    ArrayList<Enemy> enemys=new ArrayList<>();
 
 
     @Override
@@ -34,6 +35,7 @@ public class Main extends Application {
         gamePane =new Pane();
         gracz=new Ship(Color.GREEN);
         gamePane.getChildren().add(gracz);
+        createEnemys();
 
         Scene scene=new Scene(gamePane,WIDTH,HEIGHT,TLO);
 
@@ -76,7 +78,39 @@ public class Main extends Application {
 
     void ruch(){
         //przemieszcza pociski statku
-        for(Bullet i : bullets){i.moveUp();}
+        for(Bullet i : bullets){
+            i.moveUp();
+            for(Enemy j : enemys){
+                if (i.getBoundsInParent().intersects(j.getBoundsInParent())) {
+                    j.setVisible(false);
+                    i.setVisible(false);
+                }
+            }
+        }
+    }
+
+    void createEnemys(){
+        for(double i=10;i<WIDTH;i=i+50){
+            gamePane.getChildren().add(new Enemy(i,30));
+        }
+    }
+
+    public class Enemy extends Rectangle{
+        double currentX;
+
+        Enemy(double x, double y){
+            super(30,20,Color.RED);
+            //ustala poczatkowa pozycje
+            setTranslateX(x);
+            setTranslateY(y);
+            currentX=x;
+            enemys.add(this);
+        }
+
+        void shot(){
+            bullets.add(new Bullet(currentX));
+            System.out.println("shot");
+        }
     }
 
     public class Ship extends Rectangle{
@@ -107,7 +141,7 @@ public class Main extends Application {
             }
         }
         void shot(){
-            bullets.add(new Bullet(currentX));
+            bullets.add(new Bullet(currentX+10));
             System.out.println("shot");
         }
     }
