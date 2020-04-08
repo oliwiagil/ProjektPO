@@ -25,13 +25,19 @@ public class Main extends Application {
     public Pane gamePane;
     public Timeline timeline;
     EventHandler<KeyEvent> eventHandler;
+    EventHandler<KeyEvent> eventHandler2;
     Ship gracz;
     ArrayList<Bullet> bullets=new ArrayList<>();
+    ArrayList<Bullet> bulletsEnemy=new ArrayList<>();
     ArrayList<Enemy> enemys=new ArrayList<>();
 
     //zmienne odpowiedzialne za to zeby nie mozliwe bylo strzelanie jednym ciagiem
     boolean canShot=true;
     int time;
+
+    //wartosc true mowi w ktorym kierunku porusza sie statek
+    boolean left=false;
+    boolean right=false;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -42,7 +48,10 @@ public class Main extends Application {
 
         Scene scene=new Scene(gamePane,WIDTH,HEIGHT,TLO);
 
+        //pierwszy EH obsluguje wcisniete klawisze, a drugi puszczone
         primaryStage.addEventHandler(KeyEvent.KEY_PRESSED,stworzEH());
+        primaryStage.addEventHandler(KeyEvent.KEY_RELEASED,stworzEH2());
+
         primaryStage.setTitle("SpaceInv");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -61,15 +70,41 @@ public class Main extends Application {
                         canShot=false;
                     }
                 }
-                if (wcisnieto.getCode() == KeyCode.LEFT || wcisnieto.getCode() == KeyCode.A) {
-                    gracz.moveA();
+                if(wcisnieto.getCode()==KeyCode.ENTER) {
+                    //wszyscy zostali trafieni, nowa rozgrywka
+                    if (enemys.isEmpty()) {
+                        createEnemys();
+                    }
+                }
+                else if (wcisnieto.getCode() == KeyCode.LEFT || wcisnieto.getCode() == KeyCode.A) {
+                    //kierunkiem poruszania sie statku jest lewo
+                    left=true;
                 } else if (wcisnieto.getCode() == KeyCode.RIGHT || wcisnieto.getCode() == KeyCode.D) {
-                    gracz.moveD();
+                    //kierunkiem poruszania sie statku jest prawo
+                    right=true;
                 }
             }
         };
         return eventHandler;
     }
+
+    public EventHandler<KeyEvent> stworzEH2(){
+        eventHandler2 = new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent puszczono) {
+                if (puszczono.getCode() == KeyCode.LEFT || puszczono.getCode() == KeyCode.A) {
+                    //puszczono klawisz, zatem statek przestaje poruszac sie w lewo
+                    left=false;
+                }
+                else if (puszczono.getCode() == KeyCode.RIGHT || puszczono.getCode() == KeyCode.D) {
+                    //puszczono klawisz, zatem statek przestaje poruszac sie w prawo
+                    right=false;
+                }
+            }
+        };
+        return eventHandler2;
+    }
+
 
     void uplywczasu(){
         timeline = new Timeline(
@@ -95,6 +130,10 @@ public class Main extends Application {
     }
 
     void ruch(){
+        //wykonanie ruchu statku
+        if(left){gracz.moveA();}
+        else if(right){gracz.moveD();}
+
         ArrayList<Bullet> removeB=new ArrayList<>();
         ArrayList<Enemy> removeE=new ArrayList<>();
         //przemieszcza pociski statku
@@ -118,7 +157,6 @@ public class Main extends Application {
         //usuwam wszystkie elementy ktore w tym ruchu zostaly trafione
         bullets.removeAll(removeB);
         enemys.removeAll(removeE);
-    //    System.out.println(bullets.size());
     }
 
     void createEnemys(){
@@ -144,7 +182,7 @@ public class Main extends Application {
         }
 
         void shot(){
-            bullets.add(new Bullet(currentX));
+            bulletsEnemy.add(new Bullet(currentX));
             System.out.println("shot");
         }
     }
