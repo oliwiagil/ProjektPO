@@ -1,5 +1,3 @@
-//package sample;
-
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -13,8 +11,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Main extends Application {
     public int WIDTH=400;
@@ -31,13 +29,17 @@ public class Main extends Application {
     ArrayList<Bullet> bulletsEnemy=new ArrayList<>();
     ArrayList<Enemy> enemys=new ArrayList<>();
 
+    Random random=new Random();
+
     //zmienne odpowiedzialne za to zeby nie mozliwe bylo strzelanie jednym ciagiem
     boolean canShot=true;
     int time;
+    boolean nextWave=false;
 
     //wartosc true mowi w ktorym kierunku porusza sie statek
     boolean left=false;
     boolean right=false;
+    boolean space=false;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -66,14 +68,15 @@ public class Main extends Application {
                 //tylko gdy minal odpowiednio dlugi czas od ostatniego strzalu mozliwy jest strzal
                 if(canShot) {
                     if (wcisnieto.getCode() == KeyCode.SPACE) {
-                        gracz.shot();
-                        canShot=false;
+                        space=true;
+                      //  gracz.shot();
+                     //   canShot=false;
                     }
                 }
                 if(wcisnieto.getCode()==KeyCode.ENTER) {
                     //wszyscy zostali trafieni, nowa rozgrywka
                     if (enemys.isEmpty()) {
-                        createEnemys();
+                        nextWave=true;
                     }
                 }
                 else if (wcisnieto.getCode() == KeyCode.LEFT || wcisnieto.getCode() == KeyCode.A) {
@@ -100,12 +103,16 @@ public class Main extends Application {
                     //puszczono klawisz, zatem statek przestaje poruszac sie w prawo
                     right=false;
                 }
+                else if (puszczono.getCode() == KeyCode.SPACE) {
+                    //puszczono spacje, statek przestaje strzelac
+                    space=false;
+                }
             }
         };
         return eventHandler2;
     }
 
-
+    //wywoluje ruch i ewentualni umozliwia strzal
     void uplywczasu(){
         timeline = new Timeline(
                 new KeyFrame(
@@ -115,6 +122,7 @@ public class Main extends Application {
                             //po odpowiednim czasie umozliwia kolejny strzal
                             if(!canShot) {
                                 time++;
+                                //po uplynieciu osmiu cykli mozliwy jest kolejny strzal
                                 if(time%8==0){
                                     time=0;
                                     canShot=true;
@@ -133,6 +141,12 @@ public class Main extends Application {
         //wykonanie ruchu statku
         if(left){gracz.moveA();}
         else if(right){gracz.moveD();}
+        if(space&&canShot){gracz.shot(); canShot=false;}
+
+        //jezeli wcisnieto wczesniej enter oraz nie ma juz pociskow i przeciwnikow na planszy to tworzeni sa nowi
+        if(nextWave){
+            if(bullets.isEmpty()){createEnemys(); nextWave=false;}
+        }
 
         ArrayList<Bullet> removeB=new ArrayList<>();
         ArrayList<Enemy> removeE=new ArrayList<>();
@@ -154,9 +168,35 @@ public class Main extends Application {
             //pocisk wyszedl poza plansze wiec jest usuwany
             else{removeB.add(i);}
         }
+
         //usuwam wszystkie elementy ktore w tym ruchu zostaly trafione
         bullets.removeAll(removeB);
         enemys.removeAll(removeE);
+        removeE.clear();
+
+        for(Bullet i : bulletsEnemy){
+            if(i.moveDown()) {
+                //jakis pocisk przeciwnika trafil statek
+                if (i.getBoundsInParent().intersects(gracz.getBoundsInParent())) {
+                    gracz.setVisible(false);
+                    i.setVisible(false);
+                    //dodaje do listy elementow do usuniecia
+                    removeB.add(i);
+                    gameOver();
+                }
+            }
+            //pocisk przeciwnika wyszedl poza plansze
+            else {
+                i.setVisible(false);
+                removeB.add(i);
+            }
+        }
+        bulletsEnemy.removeAll(removeB);
+
+        //losowo wybierani sa przeciwnicy ktorzy w tym ruchu strzelaja
+        for(Enemy i : enemys){
+            if(random.nextInt(250)<1) {i.shot();}
+        }
     }
 
     void createEnemys(){
@@ -171,6 +211,7 @@ public class Main extends Application {
 
     public class Enemy extends Rectangle{
         double currentX;
+        double currentY;
 
         Enemy(double x, double y){
             super(30,20,Color.RED);
@@ -178,12 +219,13 @@ public class Main extends Application {
             setTranslateX(x);
             setTranslateY(y);
             currentX=x;
+            currentY=y;
             enemys.add(this);
         }
 
         void shot(){
-            bulletsEnemy.add(new Bullet(currentX));
-            System.out.println("shot");
+            //x jest zwiekszony o 10 aby strzaly wychodzily ze srodka wrogow
+            bulletsEnemy.add(new Bullet(currentX+10,currentY));
         }
     }
 
@@ -215,13 +257,12 @@ public class Main extends Application {
             }
         }
         void shot(){
+            //x zwiekszony o 10 aby strzaly wychodzily ze srodka statku
             bullets.add(new Bullet(currentX+10));
-            System.out.println("shot");
         }
     }
 
     public class Bullet extends Rectangle{
-        boolean delete=false;
         //obecna wysokosc pocisku
         double currentY;
         //jednostaka o jaka sie przemieszcza
@@ -236,6 +277,14 @@ public class Main extends Application {
             currentY=0.9*HEIGHT;
             gamePane.getChildren().add(this);
         }
+        Bullet(double x,double y){
+            super(10,20,Color.BLACK);
+            //poczatkowa pozycja x jest taka jak statku ktory wystrzeliwuje
+            setTranslateX(x);
+            setTranslateY(y);
+            currentY=y;
+            gamePane.getChildren().add(this);
+        }
         //jak statek strzela do gory
         boolean moveUp(){
             if(currentY-move+20>=0) {
@@ -247,10 +296,18 @@ public class Main extends Application {
             else{return false;}
         }
         //jak przeciwnicy strzelaja w dol
-        void moveDown(){
-            currentY+=move;
-            setTranslateY(currentY);
+        boolean moveDown(){
+            if(currentY+move<HEIGHT) {
+                currentY += move;
+                setTranslateY(currentY);
+                return true;
+            }
+            else{return false;}
         }
+    }
+
+    void gameOver(){
+        timeline.stop();
     }
 
     public static void main(String[] args) {
