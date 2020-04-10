@@ -9,6 +9,5 @@
 #	   --module-path /path/to/javafx-sdk-14/lib --add-modules javafx.controls,javafx.fxml
 #	  
 #
-# Author of the code in Main class is Oliwia
 # Sorry for bad english ;)
 
