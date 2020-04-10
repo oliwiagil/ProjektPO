@@ -2,11 +2,16 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -44,8 +49,42 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        startMenu(primaryStage);
+    }
 
-        startGame(primaryStage);
+    private void startMenu(Stage primaryStage) {
+
+        //Vertical column of buttons
+        VBox columnOfBtns = new VBox();
+        columnOfBtns.setAlignment(Pos.CENTER);
+        columnOfBtns.setSpacing(10d);
+
+        //Start Button
+        Button startBtn = new Button();
+        startBtn.setText("Start");
+        startBtn.setOnAction(event -> {
+            try {
+                //primaryStage.hide();
+                startGame(primaryStage);
+            } catch (Exception e){
+                System.out.println(e);
+            }
+        });
+
+        //Close Button
+        Button closeBtn = new Button("Close");
+        closeBtn.setOnAction(event ->{
+            Platform.exit();
+        });
+
+        //Add buttons to columnOfButtons
+        columnOfBtns.getChildren().addAll(startBtn, closeBtn);
+        //Scene and stage
+        Scene scene = new Scene(columnOfBtns, 250, 300);
+        primaryStage.setResizable(false);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Menu");
+        primaryStage.show();
     }
 
     private void startGame(Stage primaryStage) throws Exception{
