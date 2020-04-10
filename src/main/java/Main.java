@@ -28,7 +28,7 @@ public class Main extends Application {
     Ship gracz;
     ArrayList<Bullet> bullets=new ArrayList<>();
     ArrayList<Bullet> bulletsEnemy=new ArrayList<>();
-    ArrayList<Enemy> enemys=new ArrayList<>();
+    ArrayList<Enemy> enemies=new ArrayList<>();
 
     Random random=new Random();
 
@@ -44,10 +44,15 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        gamePane =new Pane();
+
+        startGame(primaryStage);
+    }
+
+    private void startGame(Stage primaryStage) throws Exception{
+        gamePane = new Pane();
         gracz=new Ship(Color.GREEN);
         gamePane.getChildren().add(gracz);
-        createEnemys();
+        createEnemies();
 
         Scene scene=new Scene(gamePane,WIDTH,HEIGHT,TLO);
 
@@ -76,7 +81,7 @@ public class Main extends Application {
                 }
                 if(wcisnieto.getCode()==KeyCode.ENTER) {
                     //wszyscy zostali trafieni, nowa rozgrywka
-                    if (enemys.isEmpty()) {
+                    if (enemies.isEmpty()) {
                         nextWave=true;
                     }
                 }
@@ -146,7 +151,7 @@ public class Main extends Application {
 
         //jezeli wcisnieto wczesniej enter oraz nie ma juz pociskow i przeciwnikow na planszy to tworzeni sa nowi
         if(nextWave){
-            if(bullets.isEmpty()){createEnemys(); nextWave=false;}
+            if(bullets.isEmpty()){createEnemies(); nextWave=false;}
         }
 
         ArrayList<Bullet> removeB=new ArrayList<>();
@@ -154,7 +159,7 @@ public class Main extends Application {
         //przemieszcza pociski statku
         for(Bullet i : bullets){
             if(i.moveUp()) {
-                for (Enemy j : enemys) {
+                for (Enemy j : enemies) {
                     //jezeli jakis pocisk trafil przeciwnika
                     if (i.getBoundsInParent().intersects(j.getBoundsInParent())) {
                         //ukrywam pocisk i przeciwnika
@@ -172,7 +177,7 @@ public class Main extends Application {
 
         //usuwam wszystkie elementy ktore w tym ruchu zostaly trafione
         bullets.removeAll(removeB);
-        enemys.removeAll(removeE);
+        enemies.removeAll(removeE);
         removeE.clear();
 
         for(Bullet i : bulletsEnemy){
@@ -195,12 +200,12 @@ public class Main extends Application {
         bulletsEnemy.removeAll(removeB);
 
         //losowo wybierani sa przeciwnicy ktorzy w tym ruchu strzelaja
-        for(Enemy i : enemys){
+        for(Enemy i : enemies){
             if(random.nextInt(250)<1) {i.shot();}
         }
     }
 
-    void createEnemys(){
+    void createEnemies(){
         //liczba rzedow przeciwnikow
         int k=4;
         for(double j=30;j<k*30;j=j+30) {
@@ -221,7 +226,7 @@ public class Main extends Application {
             setTranslateY(y);
             currentX=x;
             currentY=y;
-            enemys.add(this);
+            enemies.add(this);
         }
 
         void shot(){
