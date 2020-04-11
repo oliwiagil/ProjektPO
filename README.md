@@ -4,7 +4,7 @@
 # This is maven project. Created using IntelliJ Idea.
 #	- in File/Project Structure.../Project, 
 #	  I set Project SDK: 14(java version"14") 
-#	  and Project language level: X - Experimantal features,
+#	  and Project language level: 14 - Switch expressions,
 #  	- in Run/Edit Configurations/VM options: 
 #	   --module-path /path/to/javafx-sdk-14/lib --add-modules javafx.controls,javafx.fxml
 #	  
