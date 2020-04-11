@@ -3,6 +3,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
@@ -12,47 +14,57 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Random;
 
 public class SpaceInv extends Game{
 
-    EventHandler<KeyEvent> eventHandler;
-    EventHandler<KeyEvent> eventHandler2;
-    Ship gracz;
-    ArrayList<Bullet> bullets=new ArrayList<>();
-    ArrayList<Bullet> bulletsEnemy=new ArrayList<>();
-    ArrayList<Enemy> enemies=new ArrayList<>();
+    private EventHandler<KeyEvent> eventHandler;
+    private EventHandler<KeyEvent> eventHandler2;
+    private Ship gracz;
+    private ArrayList<Bullet> bullets;
+    private ArrayList<Bullet> bulletsEnemy;
+    private ArrayList<Enemy> enemies;
+    private Scene scene;
 
-    Random random=new Random();
+    private Random random;
 
     //zmienne odpowiedzialne za to zeby nie mozliwe bylo strzelanie jednym ciagiem
-    boolean canShot=true;
-    int time;
-    boolean nextWave=false;
+    private boolean canShot;
+    private int time;
+    private boolean nextWave;
 
     //wartosc true mowi w ktorym kierunku porusza sie statek
-    boolean left=false;
-    boolean right=false;
-    boolean space=false;
+    private boolean left;
+    private boolean right;
+    private boolean space;
 
-    SpaceInv(Stage stage){
+    SpaceInv(Stage stage, MainStage st){
         primaryStage = stage;
-    }
-
-    public void startGame() throws Exception{
-
+        returnMain = st;
         WIDTH = 400;
         HEIGHT = 400;
         SPEED = 30;
         TLO = Color.WHITE;
-
         gamePane = new Pane();
         gracz=new Ship(Color.GREEN);
         gamePane.getChildren().add(gracz);
+        bullets = new ArrayList<>();
+        bulletsEnemy = new ArrayList<>();
+        enemies = new ArrayList<>();
         createEnemies();
 
-        Scene scene=new Scene(gamePane,WIDTH,HEIGHT,TLO);
+        scene = new Scene(gamePane,WIDTH,HEIGHT,TLO);
 
+        random = new Random();
+        canShot=true;
+        nextWave=false;
+        left=false;
+        right=false;
+        space=false;
+    }
+
+    public void startGame() throws Exception{
         //pierwszy EH obsluguje wcisniete klawisze, a drugi puszczone
         primaryStage.addEventHandler(KeyEvent.KEY_PRESSED,stworzEH());
         primaryStage.addEventHandler(KeyEvent.KEY_RELEASED,stworzEH2());
@@ -63,6 +75,30 @@ public class SpaceInv extends Game{
         primaryStage.setResizable(false);
         primaryStage.show();
         uplywczasu();
+    }
+
+    public void resetGame(){
+        for(Bullet b: bullets){
+            b.setVisible(false);
+        }
+        for(Bullet b: bulletsEnemy){
+            b.setVisible(false);
+        }
+        for(Enemy e: enemies){
+            e.setVisible(false);
+        }
+        bullets.clear();
+        bulletsEnemy.clear();
+        enemies.clear();
+
+        createEnemies();
+        gracz.setVisible(true);
+        gracz.setPosition();
+        canShot=true;
+        nextWave=false;
+        left=false;
+        right=false;
+        space=false;
     }
 
     private EventHandler<KeyEvent> stworzEH(){
@@ -243,9 +279,7 @@ public class SpaceInv extends Game{
         Ship(Color color){
             super(30,20,color);
             //ustala poczatkowa pozycje
-            setTranslateX((double) WIDTH/2);
-            setTranslateY(HEIGHT-20);
-            currentX=(double) WIDTH/2;
+            setPosition();
         }
 
         void moveD() {
@@ -264,6 +298,12 @@ public class SpaceInv extends Game{
         void shot(){
             //x zwiekszony o 10 aby strzaly wychodzily ze srodka statku
             bullets.add(new Bullet(currentX+10));
+        }
+
+        void setPosition(){
+            setTranslateX((double) WIDTH/2);
+            setTranslateY(HEIGHT-20);
+            currentX=(double) WIDTH/2;
         }
     }
 
@@ -313,5 +353,6 @@ public class SpaceInv extends Game{
 
     private void gameOver(){
         timeline.stop();
+        returnMain.overStage.show();
     }
 }

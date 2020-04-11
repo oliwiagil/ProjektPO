@@ -12,6 +12,8 @@ public abstract class Game {
     protected Color TLO;
     protected Pane gamePane;
     protected Timeline timeline;
+    protected MainStage returnMain;
 
     public abstract void startGame() throws Exception;
+    public abstract void resetGame();
 }
