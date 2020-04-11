@@ -14,17 +14,8 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class SpaceInv {
+public class SpaceInv extends Game{
 
-    Stage primaryStage;
-
-    public int WIDTH=400;
-    public int HEIGHT=400;
-    private int SPEED=30;
-    public Color TLO =Color.WHITE;
-
-    public Pane gamePane;
-    public Timeline timeline;
     EventHandler<KeyEvent> eventHandler;
     EventHandler<KeyEvent> eventHandler2;
     Ship gracz;
@@ -49,6 +40,12 @@ public class SpaceInv {
     }
 
     public void startGame() throws Exception{
+
+        WIDTH = 400;
+        HEIGHT = 400;
+        SPEED = 30;
+        TLO = Color.WHITE;
+
         gamePane = new Pane();
         gracz=new Ship(Color.GREEN);
         gamePane.getChildren().add(gracz);
@@ -68,7 +65,7 @@ public class SpaceInv {
         uplywczasu();
     }
 
-    public EventHandler<KeyEvent> stworzEH(){
+    private EventHandler<KeyEvent> stworzEH(){
         eventHandler = new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent wcisnieto) {
@@ -99,7 +96,7 @@ public class SpaceInv {
         return eventHandler;
     }
 
-    public EventHandler<KeyEvent> stworzEH2(){
+    private EventHandler<KeyEvent> stworzEH2(){
         eventHandler2 = new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent puszczono) {
@@ -121,7 +118,7 @@ public class SpaceInv {
     }
 
     //wywoluje ruch i ewentualni umozliwia strzal
-    void uplywczasu(){
+    private void uplywczasu(){
         timeline = new Timeline(
                 new KeyFrame(
                         Duration.millis(SPEED),
@@ -145,7 +142,7 @@ public class SpaceInv {
         timeline.play();
     }
 
-    void ruch(){
+    private void ruch(){
         //wykonanie ruchu statku
         if(left){gracz.moveA();}
         else if(right){gracz.moveD();}
@@ -207,7 +204,7 @@ public class SpaceInv {
         }
     }
 
-    void createEnemies(){
+    private void createEnemies(){
         //liczba rzedow przeciwnikow
         int k=4;
         for(double j=30;j<k*30;j=j+30) {
@@ -217,7 +214,7 @@ public class SpaceInv {
         }
     }
 
-    public class Enemy extends Rectangle {
+    private class Enemy extends Rectangle {
         double currentX;
         double currentY;
 
@@ -237,7 +234,7 @@ public class SpaceInv {
         }
     }
 
-    public class Ship extends Rectangle{
+    private class Ship extends Rectangle{
         //obecna pozycja statku
         double currentX;
         //jednostaka o jaka sie przemieszcza
@@ -270,7 +267,7 @@ public class SpaceInv {
         }
     }
 
-    public class Bullet extends Rectangle{
+    private class Bullet extends Rectangle{
         //obecna wysokosc pocisku
         double currentY;
         //jednostaka o jaka sie przemieszcza
@@ -314,7 +311,7 @@ public class SpaceInv {
         }
     }
 
-    void gameOver(){
+    private void gameOver(){
         timeline.stop();
     }
 }

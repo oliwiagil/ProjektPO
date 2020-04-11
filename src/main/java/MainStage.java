@@ -17,7 +17,8 @@ import java.util.List;
 public class MainStage{
     private Stage primStage;
     private Scene menuScene;
-    private SpaceInv gameSpaceInv;
+    private Scene settingsScene;
+    private Game gameSpaceInv;
 
     MainStage(Stage s){
         primStage = s;
