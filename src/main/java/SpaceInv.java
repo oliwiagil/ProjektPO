@@ -8,11 +8,13 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
@@ -38,6 +40,15 @@ public class SpaceInv extends Game{
     private boolean left;
     private boolean right;
     private boolean space;
+
+    //audio
+    //https://archive.org/details/RIFLEGUNTIKKAT3TACTICALSHOT01
+    //Mattias Michael Lahoud
+    static AudioClip sound1 = new AudioClip(new File("sounds/t2Expl.mp3").toURI().toString());
+    //https://archive.org/details/GunSound
+    static AudioClip sound2 = new AudioClip(new File("sounds/shot.mp3").toURI().toString());
+    //https://archive.org/details/BigExplosionEffectVideoMp4HDSound
+    static AudioClip sound3 = new AudioClip(new File("sounds/explosion.mp3").toURI().toString());
 
     SpaceInv(Stage stage, MainStage st){
         primaryStage = stage;
@@ -69,7 +80,7 @@ public class SpaceInv extends Game{
         primaryStage.addEventHandler(KeyEvent.KEY_PRESSED,stworzEH());
         primaryStage.addEventHandler(KeyEvent.KEY_RELEASED,stworzEH2());
 
-        primaryStage.setTitle("SpaceInv");
+        primaryStage.setTitle("SpaceInvaders");
         primaryStage.setScene(scene);
         primaryStage.centerOnScreen();
         primaryStage.setResizable(false);
@@ -197,6 +208,7 @@ public class SpaceInv extends Game{
                 for (Enemy j : enemies) {
                     //jezeli jakis pocisk trafil przeciwnika
                     if (i.getBoundsInParent().intersects(j.getBoundsInParent())) {
+                        sound1.play();
                         //ukrywam pocisk i przeciwnika
                         j.setVisible(false);
                         i.setVisible(false);
@@ -296,6 +308,8 @@ public class SpaceInv extends Game{
             }
         }
         void shot(){
+            sound2.play();
+
             //x zwiekszony o 10 aby strzaly wychodzily ze srodka statku
             bullets.add(new Bullet(currentX+10));
         }
@@ -352,6 +366,7 @@ public class SpaceInv extends Game{
     }
 
     private void gameOver(){
+        sound3.play();
         timeline.stop();
         returnMain.overStage.show();
     }

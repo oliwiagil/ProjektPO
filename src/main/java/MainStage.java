@@ -138,6 +138,7 @@ public class MainStage{
             Button btn1 = new Button("Again");
             btn1.setOnAction((event) ->{
                 try {
+                    SpaceInv.sound3.stop();
                     lastGame.resetGame();
                     lastGame.startGame();
                 } catch(Exception e){
@@ -149,6 +150,7 @@ public class MainStage{
 
             Button btn2 = new Button("Menu");
             btn2.setOnAction((event)->{
+                SpaceInv.sound3.stop();
                 setMainMenuScene();
                 this.hide();
             });
