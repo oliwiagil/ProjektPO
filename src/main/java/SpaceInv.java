@@ -5,11 +5,15 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -44,11 +48,11 @@ public class SpaceInv extends Game{
     //audio
     //https://archive.org/details/RIFLEGUNTIKKAT3TACTICALSHOT01
     //Mattias Michael Lahoud
-    static AudioClip sound1 = new AudioClip(new File("sounds/t2Expl.mp3").toURI().toString());
+    static AudioClip sound1 = new AudioClip(new File("media/t2Expl.mp3").toURI().toString());
     //https://archive.org/details/GunSound
-    static AudioClip sound2 = new AudioClip(new File("sounds/shot.mp3").toURI().toString());
+    static AudioClip sound2 = new AudioClip(new File("media/shot.mp3").toURI().toString());
     //https://archive.org/details/BigExplosionEffectVideoMp4HDSound
-    static AudioClip sound3 = new AudioClip(new File("sounds/explosion.mp3").toURI().toString());
+    static AudioClip sound3 = new AudioClip(new File("media/explosion.mp3").toURI().toString());
 
     SpaceInv(Stage stage, MainStage st){
         primaryStage = stage;
@@ -73,6 +77,9 @@ public class SpaceInv extends Game{
         left=false;
         right=false;
         space=false;
+
+        BackgroundFill backgroundFill = new BackgroundFill(Color.BLACK, null,null);
+        gamePane.setBackground(new Background(backgroundFill));
     }
 
     public void startGame() throws Exception{
@@ -267,7 +274,10 @@ public class SpaceInv extends Game{
         double currentY;
 
         Enemy(double x, double y){
-            super(30,20,Color.RED);
+            super(30,20);
+
+            ImagePattern pattern = new ImagePattern(new Image("file:media/enemy1.png"));
+            this.setFill(pattern);
             //ustala poczatkowa pozycje
             setTranslateX(x);
             setTranslateY(y);
@@ -290,6 +300,10 @@ public class SpaceInv extends Game{
 
         Ship(Color color){
             super(30,20,color);
+
+            ImagePattern pattern = new ImagePattern(new Image("file:media/ship2.png"));
+            this.setFill(pattern);
+
             //ustala poczatkowa pozycje
             setPosition();
         }
@@ -310,13 +324,13 @@ public class SpaceInv extends Game{
         void shot(){
             sound2.play();
 
-            //x zwiekszony o 10 aby strzaly wychodzily ze srodka statku
-            bullets.add(new Bullet(currentX+10));
+            //x zwiekszony o 14 aby strzaly wychodzily ze srodka statku
+            bullets.add(new Bullet(currentX+14));
         }
 
         void setPosition(){
             setTranslateX((double) WIDTH/2);
-            setTranslateY(HEIGHT-20);
+            setTranslateY(HEIGHT-40);
             currentX=(double) WIDTH/2;
         }
     }
@@ -325,10 +339,11 @@ public class SpaceInv extends Game{
         //obecna wysokosc pocisku
         double currentY;
         //jednostaka o jaka sie przemieszcza
-        double move=5;
+        double moveU=15;
+        double moveD=5;
 
         Bullet(double x){
-            super(10,20,Color.GREY);
+            super(3,20,Color.CHARTREUSE);
             //poczatkowa pozycja x jest taka jak statku ktory wystrzeliwuje
             setTranslateX(x);
             //poczatkowa wysokosc pocisku
@@ -337,7 +352,11 @@ public class SpaceInv extends Game{
             gamePane.getChildren().add(this);
         }
         Bullet(double x,double y){
-            super(10,20,Color.BLACK);
+            super(3,20,Color.WHITE);
+
+            //ImagePattern pattern = new ImagePattern(new Image("file:media/bullet1.png"));
+          //  this.setFill(pattern);
+
             //poczatkowa pozycja x jest taka jak statku ktory wystrzeliwuje
             setTranslateX(x);
             setTranslateY(y);
@@ -346,8 +365,8 @@ public class SpaceInv extends Game{
         }
         //jak statek strzela do gory
         boolean moveUp(){
-            if(currentY-move+20>=0) {
-                currentY -= move;
+            if(currentY-moveU+30>=0) {
+                currentY -= moveU;
                 setTranslateY(currentY);
                 return true;
             }
@@ -356,8 +375,8 @@ public class SpaceInv extends Game{
         }
         //jak przeciwnicy strzelaja w dol
         boolean moveDown(){
-            if(currentY+move<HEIGHT) {
-                currentY += move;
+            if(currentY+moveD<HEIGHT) {
+                currentY += moveD;
                 setTranslateY(currentY);
                 return true;
             }
