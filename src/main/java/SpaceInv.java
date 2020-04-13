@@ -65,19 +65,19 @@ public class SpaceInv extends Game{
     SpaceInv(Stage stage, MainStage st){
         primaryStage = stage;
         returnMain = st;
-        WIDTH = 500;
-        HEIGHT = 500;
+        //wszystkie wymiary skalowane sa wzgledem stalej WIDTH
+        WIDTH = 800;
+        HEIGHT = WIDTH;
         SPEED = 30;
-        TLO = Color.WHITE;
         gamePane = new Pane();
-        gracz=new Ship(Color.GREEN);
+        gracz=new Ship();
         gamePane.getChildren().add(gracz);
         bullets = new ArrayList<>();
         bulletsEnemy = new ArrayList<>();
         enemies = new ArrayList<>();
         createEnemies();
 
-        scene = new Scene(gamePane,WIDTH,HEIGHT,TLO);
+        scene = new Scene(gamePane,WIDTH,HEIGHT);
 
         random = new Random();
         canShot=true;
@@ -136,8 +136,6 @@ public class SpaceInv extends Game{
                 if(canShot) {
                     if (wcisnieto.getCode() == KeyCode.SPACE) {
                         space=true;
-                        //  gracz.shot();
-                        //   canShot=false;
                     }
                 }
                 if(wcisnieto.getCode()==KeyCode.ENTER) {
@@ -271,9 +269,11 @@ public class SpaceInv extends Game{
         //liczba rzedow przeciwnikow
         int k=5;
         //odstep w pionie
-        int gap=40;
+        int gap=(int) ((WIDTH/10)*0.8);
+        int start=(int) ((WIDTH/10)*0.2);
+        int end=(int) ((WIDTH/10)*0.9);
         for(double j=gap;j<=k*gap;j=j+gap) {
-            for (double i = 10; i < WIDTH; i = i + 45) {
+            for (double i = start; i < WIDTH; i = i + end) {
                 gamePane.getChildren().add(new Enemy(i, j,(int) j/gap));
             }
         }
@@ -284,7 +284,7 @@ public class SpaceInv extends Game{
         double currentY;
 
         Enemy(double x, double y, int type){
-            super(30,20);
+            super((WIDTH/10.0)*0.6,(WIDTH/10.0)*0.4);
             switch (type){
                 case 1: pattern = enemy2g;
                         break;
@@ -309,8 +309,9 @@ public class SpaceInv extends Game{
         }
 
         void shot(){
-            //x jest zwiekszony o 14 aby strzaly wychodzily ze srodka wrogow
-            bulletsEnemy.add(new Bullet(currentX+14,currentY));
+            //x jest zwiekszony o correction aby strzaly wychodzily ze srodka wrogow
+            double correction=(WIDTH/10.0)*0.28;
+            bulletsEnemy.add(new Bullet(currentX+correction,currentY));
         }
     }
 
@@ -318,10 +319,10 @@ public class SpaceInv extends Game{
         //obecna pozycja statku
         double currentX;
         //jednostaka o jaka sie przemieszcza
-        double move=5;
+        double move=(WIDTH/10.0)*0.1;
 
-        Ship(Color color){
-            super(30,20,color);
+        Ship(){
+            super((WIDTH/10.0)*0.6,(WIDTH/10.0)*0.4);
 
             pattern = ship3b;
             this.setFill(pattern);
@@ -331,8 +332,8 @@ public class SpaceInv extends Game{
         }
 
         void moveD() {
-            //30 to wartosc szerokosci prostokata podana w konstruktorze super
-            if (currentX+ move+30<=WIDTH) {
+            //(WIDTH/10.0)*0.6 to wartosc szerokosci prostokata podana w konstruktorze super
+            if (currentX+ move+(WIDTH/10.0)*0.6<=WIDTH) {
                 currentX += move;
                 setTranslateX(currentX);
             }
@@ -345,15 +346,15 @@ public class SpaceInv extends Game{
         }
         void shot(){
             sound2.play();
-
-            //x zwiekszony o 14 aby strzaly wychodzily ze srodka statku
-            bullets.add(new Bullet(currentX+14));
+            //x jest zwiekszony o correction aby strzaly wychodzily ze srodka wrogow
+            double correction=(WIDTH/10.0)*0.28;
+            bullets.add(new Bullet(currentX+correction));
         }
 
         void setPosition(){
-            setTranslateX((double) WIDTH/2);
-            setTranslateY(HEIGHT-40);
-            currentX=(double) WIDTH/2;
+            setTranslateX(WIDTH/2);
+            setTranslateY(HEIGHT-(HEIGHT/10.0)*0.8);
+            currentX=WIDTH/2;
         }
     }
 
@@ -361,24 +362,20 @@ public class SpaceInv extends Game{
         //obecna wysokosc pocisku
         double currentY;
         //jednostaka o jaka sie przemieszcza
-        double moveU=15;
-        double moveD=5;
+        double moveU=(WIDTH/10.0)*0.3;
+        double moveD=(WIDTH/10.0)*0.1;
 
         Bullet(double x){
-            super(3,20,Color.CHARTREUSE);
+            super((WIDTH/10.0)*0.06,(WIDTH/10.0)*0.4,Color.CHARTREUSE);
             //poczatkowa pozycja x jest taka jak statku ktory wystrzeliwuje
             setTranslateX(x);
             //poczatkowa wysokosc pocisku
-            setTranslateY(HEIGHT-10);
+            setTranslateY(HEIGHT-(WIDTH/10.0)*0.2);
             currentY=0.9*HEIGHT;
             gamePane.getChildren().add(this);
         }
         Bullet(double x,double y){
-            super(3,20,Color.WHITE);
-
-            //ImagePattern pattern = new ImagePattern(new Image("file:media/bullet1.png"));
-          //  this.setFill(pattern);
-
+            super((WIDTH/10.0)*0.06,(WIDTH/10.0)*0.4,Color.WHITE);
             //poczatkowa pozycja x jest taka jak statku ktory wystrzeliwuje
             setTranslateX(x);
             setTranslateY(y);
@@ -387,7 +384,7 @@ public class SpaceInv extends Game{
         }
         //jak statek strzela do gory
         boolean moveUp(){
-            if(currentY-moveU+30>=0) {
+            if(currentY-moveU+(WIDTH/10.0)*0.6>=0) {
                 currentY -= moveU;
                 setTranslateY(currentY);
                 return true;
