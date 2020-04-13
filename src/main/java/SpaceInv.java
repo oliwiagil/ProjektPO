@@ -3,8 +3,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -20,7 +18,6 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.Random;
 
 public class SpaceInv extends Game{
@@ -54,11 +51,22 @@ public class SpaceInv extends Game{
     //https://archive.org/details/BigExplosionEffectVideoMp4HDSound
     static AudioClip sound3 = new AudioClip(new File("media/explosion.mp3").toURI().toString());
 
+    //images
+    ImagePattern pattern;
+    ImagePattern enemy1g = new ImagePattern(new Image("file:media/enemy1g.png"));
+    ImagePattern enemy1b = new ImagePattern(new Image("file:media/enemy1b.png"));
+    ImagePattern enemy1w = new ImagePattern(new Image("file:media/enemy1w.png"));
+    ImagePattern enemy2g = new ImagePattern(new Image("file:media/enemy2g.png"));
+    ImagePattern enemy3b = new ImagePattern(new Image("file:media/enemy3b.png"));
+    ImagePattern enemy3f = new ImagePattern(new Image("file:media/enemy3f.png"));
+    ImagePattern ship3b = new ImagePattern(new Image("file:media/ship3b.png"));
+
+
     SpaceInv(Stage stage, MainStage st){
         primaryStage = stage;
         returnMain = st;
-        WIDTH = 400;
-        HEIGHT = 400;
+        WIDTH = 500;
+        HEIGHT = 500;
         SPEED = 30;
         TLO = Color.WHITE;
         gamePane = new Pane();
@@ -261,10 +269,12 @@ public class SpaceInv extends Game{
 
     private void createEnemies(){
         //liczba rzedow przeciwnikow
-        int k=4;
-        for(double j=30;j<k*30;j=j+30) {
-            for (double i = 10; i < WIDTH; i = i + 50) {
-                gamePane.getChildren().add(new Enemy(i, j));
+        int k=5;
+        //odstep w pionie
+        int gap=40;
+        for(double j=gap;j<=k*gap;j=j+gap) {
+            for (double i = 10; i < WIDTH; i = i + 45) {
+                gamePane.getChildren().add(new Enemy(i, j,(int) j/gap));
             }
         }
     }
@@ -273,10 +283,22 @@ public class SpaceInv extends Game{
         double currentX;
         double currentY;
 
-        Enemy(double x, double y){
+        Enemy(double x, double y, int type){
             super(30,20);
-
-            ImagePattern pattern = new ImagePattern(new Image("file:media/enemy1.png"));
+            switch (type){
+                case 1: pattern = enemy2g;
+                        break;
+                case 2: pattern = enemy1g;
+                        break;
+                case 3: pattern = enemy1b;
+                        break;
+                case 4: pattern = enemy3b;
+                        break;
+                case 5: pattern = enemy3f;
+                        break;
+                default: pattern = enemy1w;
+                        break;
+            }
             this.setFill(pattern);
             //ustala poczatkowa pozycje
             setTranslateX(x);
@@ -287,8 +309,8 @@ public class SpaceInv extends Game{
         }
 
         void shot(){
-            //x jest zwiekszony o 10 aby strzaly wychodzily ze srodka wrogow
-            bulletsEnemy.add(new Bullet(currentX+10,currentY));
+            //x jest zwiekszony o 14 aby strzaly wychodzily ze srodka wrogow
+            bulletsEnemy.add(new Bullet(currentX+14,currentY));
         }
     }
 
@@ -301,7 +323,7 @@ public class SpaceInv extends Game{
         Ship(Color color){
             super(30,20,color);
 
-            ImagePattern pattern = new ImagePattern(new Image("file:media/ship2.png"));
+            pattern = ship3b;
             this.setFill(pattern);
 
             //ustala poczatkowa pozycje
