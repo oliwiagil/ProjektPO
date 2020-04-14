@@ -5,29 +5,25 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.util.List;
+import java.util.*;
 
 //MainStage must be initialized with stage
 /*
  * Stage given in Constructor is used to:
  * - Main menu
- * - Games
  * - setting scenes(which are planned, there will be settings related to games e.g. difficulty level)
  *
- * But overStage and WinStage have own and new stages.
+ * But games, overStage and WinStage have their own and new stages.
  *
- * There is option to create own stages for games, it must be discussed.
  */
 public class MainStage{
     //Here is stage from Constructor
@@ -50,19 +46,25 @@ public class MainStage{
     public OverStage overStage;
     public WinStage winStage;
 
+    private enum GAMES{ SPACEINV };
+    private GAMES runnedGame;
+
     MainStage(Stage s){
         primStage = s;
         lastGame = null;
         spaceInvGame = null;
+        runnedGame = null;
 
         overStage = new OverStage();
         winStage = new WinStage();
 
-        createMainMenuScene();
+        settingsScene = createSettingsScene();
+        menuScene = createMainMenuScene();
+
         setMainMenuScene();
     }
 
-    private void createMainMenuScene(){
+    private Scene createMainMenuScene(){
 
         //Vertical column of buttons
         VBox columnOfBtns = new VBox();
@@ -71,7 +73,7 @@ public class MainStage{
         columnOfBtns.setPrefWidth(120);
 
         //Text
-        Text txt = new Text();
+        Label txt = new Label();
         txt.setText("Games Manager");
         txt.setTextAlignment(TextAlignment.CENTER);
         txt.setFont(Font.font("Serif", 20));
@@ -87,11 +89,74 @@ public class MainStage{
         spaceBtn.setText("Space Invaders");
         spaceBtn.setMinWidth(columnOfBtns.getPrefWidth());
         spaceBtn.setOnAction((event)->{
+            setSettingsScene(GAMES.SPACEINV);
+        });
+
+        //Exit Button
+        Button exitBtn = new Button("Exit");
+        exitBtn.setMinWidth(columnOfBtns.getPrefWidth());
+        exitBtn.setOnAction((event)-> Platform.exit() );
+
+        //Add buttons to columnOfButtons
+        columnOfBtns.getChildren().addAll(txt, spaceBtn, exitBtn);
+        //Scene
+        return new Scene(columnOfBtns, 350, 400);
+    }
+
+    //If we want to invoke Main menu we can use this
+    private void setMainMenuScene(){
+        primStage.setResizable(false);
+        primStage.setScene(menuScene);
+        primStage.setTitle("SpaceInv");
+        primStage.show();
+    }
+
+    //If we want to invoke settings scene we can use this(and give which game we want to run)
+    private void setSettingsScene(GAMES g){
+        runnedGame = g;
+        primStage.setResizable(false);
+        primStage.setScene(settingsScene);
+        primStage.setTitle("Game Settings");
+        primStage.show();
+    }
+
+    public Scene createSettingsScene(){
+
+        //difficulty
+        //resolution
+        //back Start
+
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(20));
+        grid.setHgap(5);
+        grid.setVgap(5);
+
+
+        Label lblDiff = new Label("_Difficulty:");
+        Label lblRes = new Label("_Resolution:");
+
+        ChoiceBox chbDiff = new ChoiceBox();
+        chbDiff.getItems().addAll("Easy", "Normal", "Hard");
+        lblDiff.setLabelFor(chbDiff);
+        lblDiff.setMnemonicParsing(true);
+
+
+        ChoiceBox chbRes = new ChoiceBox();
+        chbRes.getItems().addAll(Arrays.asList("1920x1080", "1680x1050", "1400x1050",
+                        "1600x900", "1280x1024", "1440x900", "1280x800", "1152x864",
+                        "1280x720", "1024x768", "800x600"));
+        lblRes.setLabelFor(chbRes);
+        lblRes.setMnemonicParsing(true);
+
+        Button btnBack = new Button("Back");
+        btnBack.setOnAction((event) ->{
+            setMainMenuScene();
+        });
+
+        Button btnStart = new Button("Start");
+        btnStart.setOnAction((event)->{
             try {
-                if(spaceInvGame == null){
-                    spaceInvGame = new SpaceInv(primStage, this);
-                }
-                lastGame = spaceInvGame;
+                lastGame = setGame();
                 lastGame.resetGame();
                 lastGame.startGame();
             } catch (Exception e){
@@ -99,24 +164,26 @@ public class MainStage{
             }
         });
 
-        //Exit Button
-        Button exitBtn = new Button("Exit");
-        exitBtn.setMinWidth(columnOfBtns.getPrefWidth());
-        exitBtn.setOnAction((event)->{
-            Platform.exit();
-        });
+        grid.add(lblDiff, 0, 0);
+        grid.add(chbDiff, 2, 0);
+        grid.add(lblRes, 0,1);
+        grid.add(chbRes, 2,1);
+        grid.add(btnBack, 0, 2);
+        grid.add(btnStart, 2, 2);
 
-        //Add buttons to columnOfButtons
-        columnOfBtns.getChildren().addAll(txt, spaceBtn, exitBtn);
-        //Scene
-        menuScene = new Scene(columnOfBtns, 350, 400);
+        return new Scene(grid);
     }
 
-    private void setMainMenuScene(){
-        primStage.setResizable(false);
-        primStage.setScene(menuScene);
-        primStage.setTitle("SpaceInv");
-        primStage.show();
+    private Game setGame(){
+        switch(runnedGame){
+            case SPACEINV:
+                if(spaceInvGame == null){
+                    spaceInvGame = new SpaceInv(this);
+                }
+                return spaceInvGame;
+            default:
+                return null;
+        }
     }
 
     //This is that window when we lost the game
@@ -150,6 +217,7 @@ public class MainStage{
 
             Button btn2 = new Button("Menu");
             btn2.setOnAction((event)->{
+                lastGame.gameStage.hide();
                 SpaceInv.sound3.stop();
                 setMainMenuScene();
                 this.hide();
@@ -159,16 +227,74 @@ public class MainStage{
             gP.add(btn1, 0, 1);
             gP.add(btn2, 2, 1);
 
-            scene = new Scene(gP, 200, 100);
+            scene = new Scene(gP, 300, 150);
             this.setScene(scene);
             this.setTitle("Game Over");
             this.centerOnScreen();
             this.setAlwaysOnTop(true);
+
+            //This modality locks all windows except this one,
+            //so first of all we must interact with this window
+            this.initModality(Modality.APPLICATION_MODAL);
         }
     }
 
     //This will be the window when we win the game
     public class WinStage extends Stage{
+        Scene scene;
 
+        WinStage(){
+            GridPane gP = new GridPane();
+            gP.setAlignment(Pos.CENTER);
+            gP.setHgap(15);
+            gP.setVgap(5);
+
+
+            Text txt = new Text();
+            txt.setText("WIN");
+            txt.setTextAlignment(TextAlignment.CENTER);
+            txt.setFont(Font.font("Serif", 25));
+
+            Text txt2 = new Text();
+            txt2.setText("Do you want to play again?");
+            txt2.setTextAlignment(TextAlignment.CENTER);
+            txt2.setFont(Font.font("Serif", 10));
+
+            Button btn1 = new Button("Again");
+            btn1.setOnAction((event) ->{
+                try {
+                    SpaceInv.sound3.stop();
+                    lastGame.resetGame();
+                    lastGame.startGame();
+                } catch(Exception e){
+                    e.printStackTrace();
+                } finally{
+                    this.hide();
+                }
+            });
+
+            Button btn2 = new Button("Menu");
+            btn2.setOnAction((event)->{
+                lastGame.gameStage.hide();
+                SpaceInv.sound3.stop();
+                setMainMenuScene();
+                this.hide();
+            });
+
+            gP.add(txt, 1, 0, 1, 1);
+            gP.add(txt2, 0, 1, 3, 1);
+            gP.add(btn1, 0, 2);
+            gP.add(btn2, 2, 2);
+
+            scene = new Scene(gP, 300, 150);
+            this.setScene(scene);
+            this.setTitle("Win");
+            this.centerOnScreen();
+            this.setAlwaysOnTop(true);
+
+            //This modality locks all windows except this one,
+            //so first of all we must interact with this window
+            this.initModality(Modality.APPLICATION_MODAL);
+        }
     }
 }

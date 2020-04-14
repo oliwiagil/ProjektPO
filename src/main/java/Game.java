@@ -5,9 +5,12 @@ import javafx.stage.Stage;
 
 public abstract class Game {
 
-    protected Stage primaryStage;
-    protected double WIDTH;
-    protected double HEIGHT;
+    enum DIFFICULTY{ EASY, NORMAL, HARD};
+
+    public DIFFICULTY difficulty;
+    public Stage gameStage;
+    public double WIDTH;
+    public double HEIGHT;
     protected int SPEED;
     protected Pane gamePane;
     protected Timeline timeline;

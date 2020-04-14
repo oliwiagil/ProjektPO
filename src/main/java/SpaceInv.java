@@ -62,11 +62,12 @@ public class SpaceInv extends Game{
     ImagePattern ship3b = new ImagePattern(new Image("file:media/ship3b.PNG"));
     ImagePattern enemyhit = new ImagePattern(new Image("file:media/explosion2.PNG"));
 
-    SpaceInv(Stage stage, MainStage st){
-        primaryStage = stage;
+    SpaceInv(MainStage st){
+
+        gameStage = new Stage();
         returnMain = st;
         //wszystkie wymiary skalowane sa wzgledem stalej WIDTH
-        WIDTH = 800;
+        WIDTH = 1000;
         HEIGHT = WIDTH;
         SPEED = 30;
         gamePane = new Pane();
@@ -92,14 +93,15 @@ public class SpaceInv extends Game{
 
     public void startGame() throws Exception{
         //pierwszy EH obsluguje wcisniete klawisze, a drugi puszczone
-        primaryStage.addEventHandler(KeyEvent.KEY_PRESSED,stworzEH());
-        primaryStage.addEventHandler(KeyEvent.KEY_RELEASED,stworzEH2());
+        gameStage.addEventHandler(KeyEvent.KEY_PRESSED,stworzEH());
+        gameStage.addEventHandler(KeyEvent.KEY_RELEASED,stworzEH2());
 
-        primaryStage.setTitle("SpaceInvaders");
-        primaryStage.setScene(scene);
-        primaryStage.centerOnScreen();
-        primaryStage.setResizable(true);
-        primaryStage.show();
+        gameStage.setTitle("SpaceInvaders");
+        gameStage.setScene(scene);
+        //gameStage.setFullScreen(true);
+        gameStage.centerOnScreen();
+        gameStage.setResizable(true);
+        gameStage.show();
         uplywczasu();
     }
 
@@ -225,8 +227,9 @@ public class SpaceInv extends Game{
         if(space&&canShot){gracz.shot(); canShot=false;}
 
         //jezeli wcisnieto wczesniej enter oraz nie ma juz pociskow i przeciwnikow na planszy to tworzeni sa nowi
-        if(nextWave){
-            if(bullets.isEmpty()){createEnemies(); nextWave=false;}
+        //if(nextWave){ if(bullets.isEmpty()){createEnemies(); nextWave=false;} }
+        if(enemies.isEmpty()) {
+            gameWin();
         }
 
         ArrayList<Bullet> removeB=new ArrayList<>();
@@ -424,5 +427,11 @@ public class SpaceInv extends Game{
         sound3.play();
         timeline.stop();
         returnMain.overStage.show();
+    }
+
+    private void gameWin(){
+        //sound3.play();
+        timeline.stop();
+        returnMain.winStage.show();
     }
 }
