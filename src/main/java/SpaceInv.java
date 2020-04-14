@@ -53,14 +53,14 @@ public class SpaceInv extends Game{
 
     //images
     ImagePattern pattern;
-    ImagePattern enemy1g = new ImagePattern(new Image("file:media/enemy1g.png"));
-    ImagePattern enemy1b = new ImagePattern(new Image("file:media/enemy1b.png"));
-    ImagePattern enemy1w = new ImagePattern(new Image("file:media/enemy1w.png"));
-    ImagePattern enemy2g = new ImagePattern(new Image("file:media/enemy2g.png"));
-    ImagePattern enemy3b = new ImagePattern(new Image("file:media/enemy3b.png"));
-    ImagePattern enemy3f = new ImagePattern(new Image("file:media/enemy3f.png"));
-    ImagePattern ship3b = new ImagePattern(new Image("file:media/ship3b.png"));
-    ImagePattern enemyhit = new ImagePattern(new Image("file:media/explosion2.png"));
+    ImagePattern enemy1g = new ImagePattern(new Image("file:media/enemy1g.PNG"));
+    ImagePattern enemy1b = new ImagePattern(new Image("file:media/enemy1b.PNG"));
+    ImagePattern enemy1w = new ImagePattern(new Image("file:media/enemy1w.PNG"));
+    ImagePattern enemy2g = new ImagePattern(new Image("file:media/enemy2g.PNG"));
+    ImagePattern enemy3b = new ImagePattern(new Image("file:media/enemy3b.PNG"));
+    ImagePattern enemy3f = new ImagePattern(new Image("file:media/enemy3f.PNG"));
+    ImagePattern ship3b = new ImagePattern(new Image("file:media/ship3b.PNG"));
+    ImagePattern enemyhit = new ImagePattern(new Image("file:media/explosion2.PNG"));
 
     SpaceInv(Stage stage, MainStage st){
         primaryStage = stage;
@@ -98,7 +98,7 @@ public class SpaceInv extends Game{
         primaryStage.setTitle("SpaceInvaders");
         primaryStage.setScene(scene);
         primaryStage.centerOnScreen();
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         primaryStage.show();
         uplywczasu();
     }
