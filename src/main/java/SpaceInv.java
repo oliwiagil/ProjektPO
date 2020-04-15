@@ -113,6 +113,9 @@ public class SpaceInv extends Game{
             HEIGHT = 1000;
             WIDTH = 1000;
             fullScreen = false;
+        } finally {
+            //gra wymaga na razie kwadratowego okna, w przciwnym razie wszystkie elementy sa znieksztalcone
+            WIDTH=HEIGHT;
         }
 
         SPEED = 30;
@@ -350,7 +353,7 @@ public class SpaceInv extends Game{
         //liczba rzedow przeciwnikow
         int k=5;
         //odstep w pionie
-        int gap=(int) ((WIDTH/10)*0.8);
+        int gap=(int) ((HEIGHT/10)*0.8);
         int start=(int) ((WIDTH/10)*0.2);
         int end=(int) ((WIDTH/10)*0.9);
         for(double j=gap;j<=k*gap;j=j+gap) {
@@ -366,7 +369,7 @@ public class SpaceInv extends Game{
         int type;
 
         Enemy(double x, double y, int type){
-            super((WIDTH/10.0)*0.6,(WIDTH/10.0)*0.4);
+            super((WIDTH/10.0)*0.6,(HEIGHT/10.0)*0.4);
             switch (type){
                 case 1: pattern = enemy2g;
                         break;
@@ -405,7 +408,7 @@ public class SpaceInv extends Game{
         double move=(WIDTH/10.0)*0.1;
 
         Ship(){
-            super((WIDTH/10.0)*0.6,(WIDTH/10.0)*0.4);
+            super((WIDTH/10.0)*0.6,(HEIGHT/10.0)*0.4);
 
             pattern = ship3b;
             this.setFill(pattern);
@@ -445,20 +448,20 @@ public class SpaceInv extends Game{
         //obecna wysokosc pocisku
         double currentY;
         //jednostaka o jaka sie przemieszcza
-        double moveU=(WIDTH/10.0)*0.3;
-        double moveD=(WIDTH/10.0)*0.1;
+        double moveU=(HEIGHT/10.0)*0.3;
+        double moveD=(HEIGHT/10.0)*0.1;
 
         Bullet(double x){
-            super((WIDTH/10.0)*0.06,(WIDTH/10.0)*0.4,Color.CHARTREUSE);
+            super((WIDTH/10.0)*0.06,(HEIGHT/10.0)*0.4,Color.CHARTREUSE);
             //poczatkowa pozycja x jest taka jak statku ktory wystrzeliwuje
             setTranslateX(x);
             //poczatkowa wysokosc pocisku
-            setTranslateY(HEIGHT-(WIDTH/10.0)*0.2);
+            setTranslateY(HEIGHT-(HEIGHT/10.0)*0.2);
             currentY=0.9*HEIGHT;
             gamePane.getChildren().add(this);
         }
         Bullet(double x,double y){
-            super((WIDTH/10.0)*0.06,(WIDTH/10.0)*0.4,Color.WHITE);
+            super((WIDTH/10.0)*0.06,(HEIGHT/10.0)*0.4,Color.WHITE);
             //poczatkowa pozycja x jest taka jak statku ktory wystrzeliwuje
             setTranslateX(x);
             setTranslateY(y);
@@ -467,7 +470,7 @@ public class SpaceInv extends Game{
         }
         //jak statek strzela do gory
         boolean moveUp(){
-            if(currentY-moveU+(WIDTH/10.0)*0.6>=0) {
+            if(currentY-moveU+(HEIGHT/10.0)*0.6>=0) {
                 currentY -= moveU;
                 setTranslateY(currentY);
                 return true;
