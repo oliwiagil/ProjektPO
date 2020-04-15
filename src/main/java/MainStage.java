@@ -12,8 +12,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.*;
 
 //MainStage must be initialized with stage
@@ -38,7 +41,7 @@ public class MainStage{
     private Game lastGame;
     private SpaceInv spaceInvGame;
 
-    /*Here are  public stages to use in every game
+    /*Here are public stages to use in every game
     *it means that we use them when we:
     *       - lost game, then we start overStage
     *       - win game, then we start winStage
@@ -89,7 +92,8 @@ public class MainStage{
         spaceBtn.setText("Space Invaders");
         spaceBtn.setMinWidth(columnOfBtns.getPrefWidth());
         spaceBtn.setOnAction((event)->{
-            setSettingsScene(GAMES.SPACEINV);
+            runnedGame = GAMES.SPACEINV;
+            setSettingsScene();
         });
 
         //Exit Button
@@ -112,8 +116,7 @@ public class MainStage{
     }
 
     //If we want to invoke settings scene we can use this(and give which game we want to run)
-    private void setSettingsScene(GAMES g){
-        runnedGame = g;
+    private void setSettingsScene(){
         primStage.setResizable(false);
         primStage.setScene(settingsScene);
         primStage.setTitle("Game Settings");
@@ -148,6 +151,9 @@ public class MainStage{
         lblRes.setLabelFor(chbRes);
         lblRes.setMnemonicParsing(true);
 
+        CheckBox checkFullScr = new CheckBox();
+        checkFullScr.setText("Full Screen");
+
         Button btnBack = new Button("Back");
         btnBack.setOnAction((event) ->{
             setMainMenuScene();
@@ -156,11 +162,25 @@ public class MainStage{
         Button btnStart = new Button("Start");
         btnStart.setOnAction((event)->{
             try {
-                lastGame = setGame();
+                String res, diff;
+
+                if(chbRes.getValue() != null) { res = chbRes.getValue().toString(); }
+                else{ res = null; }
+
+                if(chbDiff.getValue() != null){ diff = chbDiff.getValue().toString(); }
+                else{ diff = null; }
+
+                applyChanges(res, diff, checkFullScr.isSelected());
+                spaceInvGame = new SpaceInv(this);
+                lastGame = spaceInvGame;
                 lastGame.resetGame();
                 lastGame.startGame();
+
             } catch (Exception e){
                 System.out.println(e);
+                System.out.println("Line: 173 File: MainStage.java");
+            } finally{
+                primStage.hide();
             }
         });
 
@@ -168,21 +188,66 @@ public class MainStage{
         grid.add(chbDiff, 2, 0);
         grid.add(lblRes, 0,1);
         grid.add(chbRes, 2,1);
+        grid.add(checkFullScr, 3, 1);
         grid.add(btnBack, 0, 2);
         grid.add(btnStart, 2, 2);
 
         return new Scene(grid);
     }
 
-    private Game setGame(){
+    //This method get settings and write them in appropriate file.cfg
+    private void applyChanges(String resolution, String diff, boolean isFullScreen){
+
+        File fl;
         switch(runnedGame){
             case SPACEINV:
-                if(spaceInvGame == null){
-                    spaceInvGame = new SpaceInv(this);
-                }
-                return spaceInvGame;
+                fl = new File("settings/SpaceInv.cfg");
+                break;
             default:
-                return null;
+                fl = null;
+                System.out.println("it doesn't work, line: 197" + " File: MainStage.java");
+        }
+
+        try(PrintWriter pw = new PrintWriter(fl)){
+
+        //Resolution
+        if(resolution != null && !isFullScreen) {
+            int x = resolution.indexOf('x');
+            pw.println("width=" + resolution.substring(0, x));
+            pw.println("height=" + resolution.substring(x + 1));
+        }
+        else if(isFullScreen){
+            pw.println("width=" + Screen.getPrimary().getBounds().getWidth());
+            pw.println("height=" + Screen.getPrimary().getBounds().getHeight());
+        }
+        else{
+            pw.println("width=" + 1000);
+            pw.println("height=" + 1000);
+        }
+
+        //Difficulty level
+        if(diff != null) {
+            switch (diff) {
+                case "Easy":
+                    pw.println("difficulty="+"EASY");
+                    break;
+                case "Normal":
+                    pw.println("difficulty="+"NORMAL");
+                    break;
+                case "Hard":
+                    pw.println("difficulty="+"HARD");
+                    break;
+            }
+        }
+        else{
+            pw.println("difficulty="+"NORMAL");
+        }
+
+        //FullScreen mode
+        pw.println("fullscreen="+isFullScreen);
+        } catch( Exception e){
+            System.out.println(e);
+            System.out.println("Line: "+ 240);
         }
     }
 

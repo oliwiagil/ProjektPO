@@ -1,3 +1,4 @@
+//import com.sun.glass.ui.Screen;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -14,11 +15,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.stage.Screen;
 import javafx.util.Duration;
 
+import java.awt.*;
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 public class SpaceInv extends Game{
 
@@ -66,9 +71,45 @@ public class SpaceInv extends Game{
 
         gameStage = new Stage();
         returnMain = st;
-        //wszystkie wymiary skalowane sa wzgledem stalej WIDTH
-        WIDTH = 1000;
-        HEIGHT = WIDTH;
+
+        //Read settings from file.cfg and set all variables
+        try(Scanner in = new Scanner(Paths.get("settings/SpaceInv.cfg"))){
+            while(in.hasNext()){
+                String line = in.nextLine();
+                int pos = line.indexOf('=');
+                String temp1 = line.substring(0, pos);
+                String temp2 = line.substring(pos + 1);
+                switch(temp1){
+                    case "difficulty":
+                            switch(temp2){
+                                case "EASY": difficulty = DIFFICULTY.EASY; break;
+                                case "NORMAL": difficulty = DIFFICULTY.NORMAL; break;
+                                case "HARD": difficulty = DIFFICULTY.HARD; break;
+                            }
+                        break;
+                    case "height":
+                        HEIGHT = Double.parseDouble(temp2);
+                        break;
+                    case "width":
+                        WIDTH = Double.parseDouble(temp2);
+                        break;
+                    case "fullscreen":
+                            switch(temp2){
+                                case "true": fullScreen = true; break;
+                                case "false": fullScreen = false; break;
+                            }
+                        break;
+                }
+            }
+        } catch(Exception e){
+            System.out.println(e);
+            System.out.println("Line: "+ 103+" File: SpaveInv.java");
+            difficulty = DIFFICULTY.NORMAL;
+            HEIGHT = 1000;
+            WIDTH = 1000;
+            fullScreen = false;
+        }
+
         SPEED = 30;
         gamePane = new Pane();
         gracz=new Ship();
@@ -98,7 +139,9 @@ public class SpaceInv extends Game{
 
         gameStage.setTitle("SpaceInvaders");
         gameStage.setScene(scene);
-        //gameStage.setFullScreen(true);
+        if(fullScreen){
+            gameStage.setFullScreen(true);
+        }
         gameStage.centerOnScreen();
         gameStage.setResizable(true);
         gameStage.show();

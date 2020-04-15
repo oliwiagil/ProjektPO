@@ -7,10 +7,13 @@ public abstract class Game {
 
     enum DIFFICULTY{ EASY, NORMAL, HARD};
 
+    //Settings of game
     public DIFFICULTY difficulty;
-    public Stage gameStage;
     public double WIDTH;
     public double HEIGHT;
+    public boolean fullScreen;
+
+    public Stage gameStage;
     protected int SPEED;
     protected Pane gamePane;
     protected Timeline timeline;
