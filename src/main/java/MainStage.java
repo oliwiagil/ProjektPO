@@ -136,7 +136,7 @@ public class MainStage{
 
 
         Label lblDiff = new Label("_Difficulty:");
-        Label lblRes = new Label("_Resolution:");
+        Label lblRes = new Label("_Size:");
 
         ChoiceBox chbDiff = new ChoiceBox();
         chbDiff.getItems().addAll("Easy", "Normal", "Hard");
@@ -250,6 +250,9 @@ public class MainStage{
             System.out.println("Line: "+ 240);
         }
     }
+
+    //This is that window when we lost game
+    public class PauseStage extends Stage{}
 
     //This is that window when we lost the game
     public class OverStage extends Stage{
