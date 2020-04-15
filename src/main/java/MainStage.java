@@ -49,7 +49,7 @@ public class MainStage{
     public OverStage overStage;
     public WinStage winStage;
 
-    private enum GAMES{ SPACEINV };
+    private enum GAMES{ SPACEINV }
     private GAMES runnedGame;
 
     MainStage(Stage s){
@@ -331,7 +331,7 @@ public class MainStage{
             Button btn1 = new Button("Again");
             btn1.setOnAction((event) ->{
                 try {
-                    SpaceInv.sound3.stop();
+                    SpaceInv.soundWin.stop();
                     lastGame.resetGame();
                     lastGame.startGame();
                 } catch(Exception e){
@@ -344,7 +344,7 @@ public class MainStage{
             Button btn2 = new Button("Menu");
             btn2.setOnAction((event)->{
                 lastGame.gameStage.hide();
-                SpaceInv.sound3.stop();
+                SpaceInv.soundWin.stop();
                 setMainMenuScene();
                 this.hide();
             });

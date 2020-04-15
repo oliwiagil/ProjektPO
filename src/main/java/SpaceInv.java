@@ -55,6 +55,8 @@ public class SpaceInv extends Game{
     static AudioClip sound2 = new AudioClip(new File("media/shot.mp3").toURI().toString());
     //https://archive.org/details/BigExplosionEffectVideoMp4HDSound
     static AudioClip sound3 = new AudioClip(new File("media/explosion.mp3").toURI().toString());
+    //https://archive.org/details/RoyaltyFanfareHornsSoundEffectLoudTronix.meSQ1
+    static AudioClip soundWin = new AudioClip(new File("media/fanfare.mp3").toURI().toString());
 
     //images
     ImagePattern pattern;
@@ -65,7 +67,10 @@ public class SpaceInv extends Game{
     ImagePattern enemy3b = new ImagePattern(new Image("file:media/enemy3b.PNG"));
     ImagePattern enemy3f = new ImagePattern(new Image("file:media/enemy3f.PNG"));
     ImagePattern ship3b = new ImagePattern(new Image("file:media/ship3b.PNG"));
-    ImagePattern enemyhit = new ImagePattern(new Image("file:media/explosion2.PNG"));
+    static ImagePattern explosion = new ImagePattern(new Image("file:media/explosion2.PNG"));
+    static ImagePattern explosionB = new ImagePattern(new Image("file:media/explosion2b.PNG"));
+    static ImagePattern explosionG = new ImagePattern(new Image("file:media/explosion2g.PNG"));
+    static ImagePattern explosionF = new ImagePattern(new Image("file:media/explosion2f.PNG"));
 
     SpaceInv(MainStage st){
 
@@ -253,8 +258,22 @@ public class SpaceInv extends Game{
         public Explosion(Enemy x){this.x=x;}
         @Override
         public void run() {
+            switch (x.type){
+                case 1: x.setFill(explosionG);
+                    break;
+                case 2: x.setFill(explosionG);
+                    break;
+                case 3: x.setFill(explosionB);
+                    break;
+                case 4: x.setFill(explosionB);
+                    break;
+                case 5: x.setFill(explosionF);
+                    break;
+                default: x.setFill(explosion);
+                    break;
+            }
             try {
-                sleep(200);
+                sleep(300);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally{
@@ -284,7 +303,6 @@ public class SpaceInv extends Game{
                     //jezeli jakis pocisk trafil przeciwnika
                     if (i.getBoundsInParent().intersects(j.getBoundsInParent())) {
                         sound1.play();
-                        j.setFill(enemyhit);
                         //ukrywam pocisk i przeciwnika
                         new Explosion(j).start();
                         i.setVisible(false);
@@ -345,6 +363,7 @@ public class SpaceInv extends Game{
     private class Enemy extends Rectangle {
         double currentX;
         double currentY;
+        int type;
 
         Enemy(double x, double y, int type){
             super((WIDTH/10.0)*0.6,(WIDTH/10.0)*0.4);
@@ -362,6 +381,7 @@ public class SpaceInv extends Game{
                 default: pattern = enemy1w;
                         break;
             }
+            this.type=type;
             this.setFill(pattern);
             //ustala poczatkowa pozycje
             setTranslateX(x);
@@ -473,7 +493,7 @@ public class SpaceInv extends Game{
     }
 
     private void gameWin(){
-        //sound3.play();
+        soundWin.play();
         timeline.stop();
         returnMain.winStage.show();
     }
