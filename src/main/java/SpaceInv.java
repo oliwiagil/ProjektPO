@@ -47,6 +47,8 @@ public class SpaceInv extends Game{
     private boolean right;
     private boolean space;
 
+    private double korekta;
+
     //audio
     //https://archive.org/details/RIFLEGUNTIKKAT3TACTICALSHOT01
     //Mattias Michael Lahoud
@@ -62,7 +64,6 @@ public class SpaceInv extends Game{
     ImagePattern pattern;
     ImagePattern enemy1g = new ImagePattern(new Image("file:media/SpaceInv/enemy1g.PNG"));
     ImagePattern enemy1b = new ImagePattern(new Image("file:media/SpaceInv/enemy1b.PNG"));
-    ImagePattern enemy1w = new ImagePattern(new Image("file:media/SpaceInv/enemy1w.PNG"));
     ImagePattern enemy2g = new ImagePattern(new Image("file:media/SpaceInv/enemy2g.PNG"));
     ImagePattern enemy3b = new ImagePattern(new Image("file:media/SpaceInv/enemy3b.PNG"));
     ImagePattern enemy3f = new ImagePattern(new Image("file:media/SpaceInv/enemy3f.PNG"));
@@ -114,14 +115,25 @@ public class SpaceInv extends Game{
             WIDTH = 1000;
             fullScreen = false;
         } finally {
-            //gra wymaga na razie kwadratowego okna, w przciwnym razie wszystkie elementy sa znieksztalcone
-            WIDTH=HEIGHT;
+            //gra wymaga kwadratowego okna
+            korekta=(WIDTH-HEIGHT)/2;
+            System.out.println(korekta);
         }
 
         SPEED = 30;
         gamePane = new Pane();
         gracz=new Ship();
         gamePane.getChildren().add(gracz);
+
+        //dodaje sciany (tylko uwidaczniaja istniejace ograniczenia)
+        Rectangle wallL=new Rectangle(5,HEIGHT,Color.GREY);
+        Rectangle wallR=new Rectangle(5,HEIGHT,Color.GREY);
+        wallL.setTranslateX(korekta-5);
+        //nie ma jeszcze dobrze dobranej wartosci, bo statek porusza sie o rozne jednostki, wiec zakres poruszania sie statku zmienia sie
+        wallR.setTranslateX(WIDTH-korekta);
+        gamePane.getChildren().add(wallL);
+        gamePane.getChildren().add(wallR);
+
         bullets = new ArrayList<>();
         bulletsEnemy = new ArrayList<>();
         enemies = new ArrayList<>();
@@ -354,11 +366,11 @@ public class SpaceInv extends Game{
         int k=5;
         //odstep w pionie
         int gap=(int) ((HEIGHT/10)*0.8);
-        int start=(int) ((WIDTH/10)*0.2);
-        int end=(int) ((WIDTH/10)*0.9);
+        double start=(((WIDTH-2*korekta)/10)*0.2);
+        double end=(((WIDTH-2*korekta)/10)*0.9);
         for(double j=gap;j<=k*gap;j=j+gap) {
-            for (double i = start; i < WIDTH; i = i + end) {
-                gamePane.getChildren().add(new Enemy(i, j,(int) j/gap));
+            for (double i = start+korekta; i < WIDTH-korekta; i = i + end) {
+                gamePane.getChildren().add(new Enemy(i, j, (int) j/gap));
             }
         }
     }
@@ -369,7 +381,7 @@ public class SpaceInv extends Game{
         int type;
 
         Enemy(double x, double y, int type){
-            super((WIDTH/10.0)*0.6,(HEIGHT/10.0)*0.4);
+            super(((WIDTH-2*korekta)/10.0)*0.6,(HEIGHT/10.0)*0.4);
             switch (type){
                 case 1: pattern = enemy2g;
                         break;
@@ -381,7 +393,7 @@ public class SpaceInv extends Game{
                         break;
                 case 5: pattern = enemy3f;
                         break;
-                default: pattern = enemy1w;
+                default: pattern = enemy1b;
                         break;
             }
             this.type=type;
@@ -396,7 +408,7 @@ public class SpaceInv extends Game{
 
         void shot(){
             //x jest zwiekszony o correction aby strzaly wychodzily ze srodka wrogow
-            double correction=(WIDTH/10.0)*0.28;
+            double correction=((WIDTH-2*korekta)/10.0)*0.28;
             bulletsEnemy.add(new Bullet(currentX+correction,currentY));
         }
     }
@@ -405,10 +417,10 @@ public class SpaceInv extends Game{
         //obecna pozycja statku
         double currentX;
         //jednostaka o jaka sie przemieszcza
-        double move=(WIDTH/10.0)*0.1;
+        double move=((WIDTH-2*korekta)/10.0)*0.1;
 
         Ship(){
-            super((WIDTH/10.0)*0.6,(HEIGHT/10.0)*0.4);
+            super(((WIDTH-2*korekta)/10.0)*0.6,(HEIGHT/10.0)*0.4);
 
             pattern = ship3b;
             this.setFill(pattern);
@@ -419,13 +431,13 @@ public class SpaceInv extends Game{
 
         void moveD() {
             //(WIDTH/10.0)*0.6 to wartosc szerokosci prostokata podana w konstruktorze super
-            if (currentX+ move+(WIDTH/10.0)*0.6<=WIDTH) {
+            if (currentX+ move+((WIDTH-2*korekta)/10.0)*0.6<=WIDTH-korekta) {
                 currentX += move;
                 setTranslateX(currentX);
             }
         }
         void moveA(){
-            if (currentX-move>=0) {
+            if (currentX-move>=korekta) {
                 currentX -= move;
                 setTranslateX(currentX);
             }
@@ -433,7 +445,7 @@ public class SpaceInv extends Game{
         void shot(){
             sound2.play();
             //x jest zwiekszony o correction aby strzaly wychodzily ze srodka wrogow
-            double correction=(WIDTH/10.0)*0.28;
+            double correction=((WIDTH-2*korekta)/10.0)*0.28;
             bullets.add(new Bullet(currentX+correction));
         }
 
@@ -452,7 +464,7 @@ public class SpaceInv extends Game{
         double moveD=(HEIGHT/10.0)*0.1;
 
         Bullet(double x){
-            super((WIDTH/10.0)*0.06,(HEIGHT/10.0)*0.4,Color.CHARTREUSE);
+            super(((WIDTH-2*korekta)/10.0)*0.06,(HEIGHT/10.0)*0.4,Color.CHARTREUSE);
             //poczatkowa pozycja x jest taka jak statku ktory wystrzeliwuje
             setTranslateX(x);
             //poczatkowa wysokosc pocisku
@@ -461,7 +473,7 @@ public class SpaceInv extends Game{
             gamePane.getChildren().add(this);
         }
         Bullet(double x,double y){
-            super((WIDTH/10.0)*0.06,(HEIGHT/10.0)*0.4,Color.WHITE);
+            super(((WIDTH-2*korekta)/10.0)*0.06,(HEIGHT/10.0)*0.4,Color.WHITE);
             //poczatkowa pozycja x jest taka jak statku ktory wystrzeliwuje
             setTranslateX(x);
             setTranslateY(y);
