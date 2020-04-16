@@ -40,6 +40,7 @@ public class MainStage{
     //lastGame which holds last played game
     private Game lastGame;
     private SpaceInv spaceInvGame;
+    private Checkers checkersGame;
 
     /*Here are public stages to use in every game
     *it means that we use them when we:
@@ -49,7 +50,7 @@ public class MainStage{
     public OverStage overStage;
     public WinStage winStage;
 
-    private enum GAMES{ SPACEINV }
+    private enum GAMES{ SPACEINV, CHECKERS }
     private GAMES runnedGame;
 
     MainStage(Stage s){
@@ -96,13 +97,21 @@ public class MainStage{
             setSettingsScene();
         });
 
+        Button checkersBtn = new Button();
+        checkersBtn.setText("Checkers");
+        checkersBtn.setMinWidth(columnOfBtns.getPrefWidth());
+        checkersBtn.setOnAction((event)->{
+            runnedGame = GAMES.CHECKERS;
+            setSettingsScene();
+        });
+
         //Exit Button
         Button exitBtn = new Button("Exit");
         exitBtn.setMinWidth(columnOfBtns.getPrefWidth());
         exitBtn.setOnAction((event)-> Platform.exit() );
 
         //Add buttons to columnOfButtons
-        columnOfBtns.getChildren().addAll(txt, spaceBtn, exitBtn);
+        columnOfBtns.getChildren().addAll(txt, spaceBtn, checkersBtn, exitBtn);
         //Scene
         return new Scene(columnOfBtns, 350, 400);
     }
@@ -171,8 +180,17 @@ public class MainStage{
                 else{ diff = null; }
 
                 applyChanges(res, diff, checkFullScr.isSelected());
-                spaceInvGame = new SpaceInv(this);
-                lastGame = spaceInvGame;
+
+                switch(runnedGame){
+                    case SPACEINV:
+                            spaceInvGame = new SpaceInv(this);
+                            lastGame = spaceInvGame;
+                        break;
+                    case CHECKERS:
+                        checkersGame = new Checkers(this);
+                            lastGame = checkersGame;
+                         break;
+                }
                 lastGame.resetGame();
                 lastGame.startGame();
 
@@ -202,6 +220,9 @@ public class MainStage{
         switch(runnedGame){
             case SPACEINV:
                 fl = new File("settings/SpaceInv.cfg");
+                break;
+            case CHECKERS:
+                fl = new File("settings/Checkers.cfg");
                 break;
             default:
                 fl = null;

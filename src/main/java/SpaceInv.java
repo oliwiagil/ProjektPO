@@ -50,27 +50,27 @@ public class SpaceInv extends Game{
     //audio
     //https://archive.org/details/RIFLEGUNTIKKAT3TACTICALSHOT01
     //Mattias Michael Lahoud
-    static AudioClip sound1 = new AudioClip(new File("media/t2Expl.mp3").toURI().toString());
+    static AudioClip sound1 = new AudioClip(new File("media/SpaceInv/t2Expl.mp3").toURI().toString());
     //https://archive.org/details/GunSound
-    static AudioClip sound2 = new AudioClip(new File("media/shot.mp3").toURI().toString());
+    static AudioClip sound2 = new AudioClip(new File("media/SpaceInv/shot.mp3").toURI().toString());
     //https://archive.org/details/BigExplosionEffectVideoMp4HDSound
-    static AudioClip sound3 = new AudioClip(new File("media/explosion.mp3").toURI().toString());
+    static AudioClip sound3 = new AudioClip(new File("media/SpaceInv/explosion.mp3").toURI().toString());
     //https://archive.org/details/RoyaltyFanfareHornsSoundEffectLoudTronix.meSQ1
-    static AudioClip soundWin = new AudioClip(new File("media/fanfare.mp3").toURI().toString());
+    static AudioClip soundWin = new AudioClip(new File("media/SpaceInv/fanfare.mp3").toURI().toString());
 
     //images
     ImagePattern pattern;
-    ImagePattern enemy1g = new ImagePattern(new Image("file:media/enemy1g.PNG"));
-    ImagePattern enemy1b = new ImagePattern(new Image("file:media/enemy1b.PNG"));
-    ImagePattern enemy1w = new ImagePattern(new Image("file:media/enemy1w.PNG"));
-    ImagePattern enemy2g = new ImagePattern(new Image("file:media/enemy2g.PNG"));
-    ImagePattern enemy3b = new ImagePattern(new Image("file:media/enemy3b.PNG"));
-    ImagePattern enemy3f = new ImagePattern(new Image("file:media/enemy3f.PNG"));
-    ImagePattern ship3b = new ImagePattern(new Image("file:media/ship3b.PNG"));
-    static ImagePattern explosion = new ImagePattern(new Image("file:media/explosion2.PNG"));
-    static ImagePattern explosionB = new ImagePattern(new Image("file:media/explosion2b.PNG"));
-    static ImagePattern explosionG = new ImagePattern(new Image("file:media/explosion2g.PNG"));
-    static ImagePattern explosionF = new ImagePattern(new Image("file:media/explosion2f.PNG"));
+    ImagePattern enemy1g = new ImagePattern(new Image("file:media/SpaceInv/enemy1g.PNG"));
+    ImagePattern enemy1b = new ImagePattern(new Image("file:media/SpaceInv/enemy1b.PNG"));
+    ImagePattern enemy1w = new ImagePattern(new Image("file:media/SpaceInv/enemy1w.PNG"));
+    ImagePattern enemy2g = new ImagePattern(new Image("file:media/SpaceInv/enemy2g.PNG"));
+    ImagePattern enemy3b = new ImagePattern(new Image("file:media/SpaceInv/enemy3b.PNG"));
+    ImagePattern enemy3f = new ImagePattern(new Image("file:media/SpaceInv/enemy3f.PNG"));
+    ImagePattern ship3b = new ImagePattern(new Image("file:media/SpaceInv/ship3b.PNG"));
+    static ImagePattern explosion = new ImagePattern(new Image("file:media/SpaceInv/explosion2.PNG"));
+    static ImagePattern explosionB = new ImagePattern(new Image("file:media/SpaceInv/explosion2b.PNG"));
+    static ImagePattern explosionG = new ImagePattern(new Image("file:media/SpaceInv/explosion2g.PNG"));
+    static ImagePattern explosionF = new ImagePattern(new Image("file:media/SpaceInv/explosion2f.PNG"));
 
     SpaceInv(MainStage st){
 
@@ -489,13 +489,13 @@ public class SpaceInv extends Game{
         }
     }
 
-    private void gameOver(){
+    public void gameOver(){
         sound3.play();
         timeline.stop();
         returnMain.overStage.show();
     }
 
-    private void gameWin(){
+    public void gameWin(){
         soundWin.play();
         timeline.stop();
         returnMain.winStage.show();

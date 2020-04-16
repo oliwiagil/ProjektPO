@@ -21,4 +21,6 @@ public abstract class Game {
 
     public abstract void startGame() throws Exception;
     public abstract void resetGame();
+    public abstract void gameOver();
+    public abstract void gameWin();
 }
