@@ -49,6 +49,7 @@ public class MainStage{
     */
     public OverStage overStage;
     public WinStage winStage;
+    public PauseStage pauseStage;
 
     private enum GAMES{ SPACEINV, CHECKERS }
     private GAMES runnedGame;
@@ -57,10 +58,12 @@ public class MainStage{
         primStage = s;
         lastGame = null;
         spaceInvGame = null;
+        checkersGame = null;
         runnedGame = null;
 
         overStage = new OverStage();
         winStage = new WinStage();
+        pauseStage = new PauseStage();
 
         settingsScene = createSettingsScene();
         menuScene = createMainMenuScene();
@@ -272,8 +275,10 @@ public class MainStage{
         }
     }
 
-    //This is that window when we lost game
-    public class PauseStage extends Stage{}
+    //This is that window when we pause the game
+    public class PauseStage extends Stage{
+        
+    }
 
     //This is that window when we lost the game
     public class OverStage extends Stage{

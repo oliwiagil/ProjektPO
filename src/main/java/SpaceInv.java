@@ -500,4 +500,9 @@ public class SpaceInv extends Game{
         timeline.stop();
         returnMain.winStage.show();
     }
+
+    @Override
+    public void gamePause() {
+
+    }
 }

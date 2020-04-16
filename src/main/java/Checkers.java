@@ -25,4 +25,9 @@ public class Checkers extends Game{
     public void gameWin() {
 
     }
+
+    @Override
+    public void gamePause() {
+
+    }
 }

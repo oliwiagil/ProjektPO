@@ -23,4 +23,5 @@ public abstract class Game {
     public abstract void resetGame();
     public abstract void gameOver();
     public abstract void gameWin();
+    public abstract void gamePause();
 }
