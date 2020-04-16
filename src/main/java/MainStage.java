@@ -23,9 +23,9 @@ import java.util.*;
 /*
  * Stage given in Constructor is used to:
  * - Main menu
- * - setting scenes(which are planned, there will be settings related to games e.g. difficulty level)
+ * - setting scenes
  *
- * But games, overStage and WinStage have their own and new stages.
+ * But games, pauseStage, overStage and winStage have their own and new stages.
  *
  */
 public class MainStage{
@@ -46,6 +46,7 @@ public class MainStage{
     *it means that we use them when we:
     *       - lost game, then we start overStage
     *       - win game, then we start winStage
+    *       - pause game
     */
     public OverStage overStage;
     public WinStage winStage;
@@ -277,7 +278,7 @@ public class MainStage{
 
     //This is that window when we pause the game
     public class PauseStage extends Stage{
-        
+
     }
 
     //This is that window when we lost the game
