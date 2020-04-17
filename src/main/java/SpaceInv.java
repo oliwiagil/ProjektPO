@@ -322,6 +322,7 @@ public class SpaceInv extends Game{
         }
 
         ArrayList<Bullet> removeB=new ArrayList<>();
+        ArrayList<Bullet> removeBE=new ArrayList<>();
         ArrayList<Enemy> removeE=new ArrayList<>();
         //przemieszcza pociski statku
         for(Bullet i : bullets){
@@ -348,24 +349,41 @@ public class SpaceInv extends Game{
         enemies.removeAll(removeE);
         removeB.clear();
 
+        boolean tmp;
         for(Bullet i : bulletsEnemy){
             if(i.moveDown()) {
-                //jakis pocisk przeciwnika trafil statek
-                if (i.getBoundsInParent().intersects(gracz.getBoundsInParent())) {
-                    gracz.setVisible(false);
-                    i.setVisible(false);
-                    //dodaje do listy elementow do usuniecia
-                    removeB.add(i);
-                    gameOver();
+                tmp=true;
+                for(Bullet j : bullets){
+                    //pocisk trafil pocisk gracza
+                    if (i.getBoundsInParent().intersects(j.getBoundsInParent())) {
+                        i.setVisible(false);
+                        j.setVisible(false);
+                        removeBE.add(i);
+                        removeB.add(j);
+                        tmp=false;
+                        break;
+                    }
+                }
+                //pocisk nie trafil innego pocisku, wiec moze trafic gracza
+                if(tmp) {
+                    //jakis pocisk przeciwnika trafil statek
+                    if (i.getBoundsInParent().intersects(gracz.getBoundsInParent())) {
+                        gracz.setVisible(false);
+                        i.setVisible(false);
+                        //dodaje do listy elementow do usuniecia
+                        removeBE.add(i);
+                        gameOver();
+                    }
                 }
             }
             //pocisk przeciwnika wyszedl poza plansze
             else {
                 i.setVisible(false);
-                removeB.add(i);
+                removeBE.add(i);
             }
         }
-        bulletsEnemy.removeAll(removeB);
+        bulletsEnemy.removeAll(removeBE);
+        bullets.removeAll(removeB);
 
         //losowo wybierani sa przeciwnicy ktorzy w tym ruchu strzelaja
         for(Enemy i : enemies){
