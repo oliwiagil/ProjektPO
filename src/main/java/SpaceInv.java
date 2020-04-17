@@ -15,10 +15,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import javafx.stage.Screen;
 import javafx.util.Duration;
 
-import java.awt.*;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -46,6 +44,13 @@ public class SpaceInv extends Game{
     private boolean left;
     private boolean right;
     private boolean space;
+
+    //sterownie poruszaniem wrogow
+    private boolean moveR =true;
+    private boolean moveS=false;
+    private double moveEnemy;
+    private double increaseSpeed;
+    private double sizeE;
 
     private double korekta;
 
@@ -117,8 +122,11 @@ public class SpaceInv extends Game{
         } finally {
             //gra wymaga kwadratowego okna
             korekta=(WIDTH-HEIGHT)/2;
-            System.out.println(korekta);
         }
+
+        moveEnemy =((WIDTH-2*korekta)/10.0)*0.02;
+        increaseSpeed=((WIDTH-2*korekta)/10.0)*0.02;
+        sizeE=40;
 
         SPEED = 30;
         gamePane = new Pane();
@@ -190,6 +198,10 @@ public class SpaceInv extends Game{
         left=false;
         right=false;
         space=false;
+
+        moveEnemy =((WIDTH-2*korekta)/10.0)*0.02;
+        increaseSpeed=((WIDTH-2*korekta)/10.0)*0.02;
+        sizeE=40;
     }
 
     private EventHandler<KeyEvent> stworzEH(){
@@ -288,7 +300,7 @@ public class SpaceInv extends Game{
                     break;
             }
             try {
-                sleep(300);
+                sleep(150);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally{
@@ -358,7 +370,61 @@ public class SpaceInv extends Game{
         //losowo wybierani sa przeciwnicy ktorzy w tym ruchu strzelaja
         for(Enemy i : enemies){
             if(random.nextInt(250)<1) {i.shot();}
+            //sprawdzenie czy mozliwe jest dalsze poruszanie sie przeciwnikow w prawo
+            if(moveR) {
+                if (i.currentX + moveEnemy + ((WIDTH - 2 * korekta) / 10.0) * 0.6 > WIDTH - korekta) {
+                    moveR = false;
+                    moveS=true;
+                }
+            }
+            //sprawdzenie czy mozliwe jest dalsze poruszanie sie przeciwnikow w lewo
+            else{
+                if(i.currentX-moveEnemy<korekta){
+                    moveR =true;
+                    moveS=true;
+                }
+            }
         }
+        //co 10 trafionych wrogow, zwieksza sie szybkosc ich poruszania
+        if(enemies.size()<=sizeE){
+            sizeE-=10;
+            moveEnemy+=increaseSpeed;
+        }
+
+        //przemieszczenie wszystkich wrogow w lewo lub w prawo
+        moveEnemies();
+    }
+
+    private void moveEnemies(){
+        if(moveR) {
+            if(moveS) {
+                for (Enemy i : enemies) {
+                    i.moveD();
+                    i.moveS();
+                    if(i.currentY+(HEIGHT/10.0)*0.4>=HEIGHT-(HEIGHT/10.0)*0.8){gameOver();}
+                }
+            }
+            else{
+                for (Enemy i : enemies) {
+                    i.moveD();
+                }
+            }
+        }
+        else {
+            if(moveS) {
+                for (Enemy i : enemies) {
+                    i.moveA();
+                    i.moveS();
+                    if(i.currentY+(HEIGHT/10.0)*0.4>=HEIGHT-(HEIGHT/10.0)*0.8){gameOver();}
+                }
+            }
+            else{
+                for (Enemy i : enemies) {
+                    i.moveA();
+                }
+            }
+        }
+        if(moveS){moveS=false;}
     }
 
     private void createEnemies(){
@@ -369,7 +435,7 @@ public class SpaceInv extends Game{
         double start=(((WIDTH-2*korekta)/10)*0.2);
         double end=(((WIDTH-2*korekta)/10)*0.9);
         for(double j=gap;j<=k*gap;j=j+gap) {
-            for (double i = start+korekta; i < WIDTH-korekta; i = i + end) {
+            for (double i = start+korekta+end; i < WIDTH-korekta-end; i = i + end) {
                 gamePane.getChildren().add(new Enemy(i, j, (int) j/gap));
             }
         }
@@ -379,6 +445,7 @@ public class SpaceInv extends Game{
         double currentX;
         double currentY;
         int type;
+        double moveDown=((WIDTH-2*korekta)/10.0)*0.2;
 
         Enemy(double x, double y, int type){
             super(((WIDTH-2*korekta)/10.0)*0.6,(HEIGHT/10.0)*0.4);
@@ -411,6 +478,20 @@ public class SpaceInv extends Game{
             double correction=((WIDTH-2*korekta)/10.0)*0.28;
             bulletsEnemy.add(new Bullet(currentX+correction,currentY));
         }
+
+        void moveD() {
+            currentX += moveEnemy;
+            setTranslateX(currentX);
+        }
+        void moveA(){
+            currentX -= moveEnemy;
+            setTranslateX(currentX);
+        }
+        void moveS(){
+            currentY += moveDown;
+            setTranslateY(currentY);
+        }
+
     }
 
     private class Ship extends Rectangle{
