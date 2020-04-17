@@ -517,4 +517,6 @@ public class SpaceInv extends Game{
     public void gamePause() {
 
     }
+
+    //@Override protected void finalize() throws Throwable{ System.out.println("Deleted SpaceInv"); }
 }

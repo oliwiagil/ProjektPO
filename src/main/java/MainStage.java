@@ -195,6 +195,7 @@ public class MainStage{
                             lastGame = checkersGame;
                          break;
                 }
+                System.gc();
                 lastGame.resetGame();
                 lastGame.startGame();
 
