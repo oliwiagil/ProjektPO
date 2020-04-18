@@ -6,7 +6,10 @@
 #	  I set Project SDK: 14(java version"14") 
 #	  and Project language level: 14 - Switch expressions,
 #  	- in Run/Edit Configurations/VM options: 
+#        Under Linux:
 #	   --module-path /path/to/javafx-sdk-14/lib --add-modules javafx.controls,javafx.media,javafx.fxml
+#        Under Win:
+#      --module-path /path/to/javafx-sdk-11.0.2/lib --add-modules javafx.controls,javafx.media,javafx.fxml
 #	  
 #
 # Sorry for bad english ;)
