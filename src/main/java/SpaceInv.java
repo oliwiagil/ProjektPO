@@ -1,4 +1,3 @@
-//import com.sun.glass.ui.Screen;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -658,5 +657,4 @@ public class SpaceInv extends Game{
         }
     }
 
-    //@Override protected void finalize() throws Throwable{ System.out.println("Deleted SpaceInv"); }
 }
