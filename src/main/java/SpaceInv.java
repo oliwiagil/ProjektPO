@@ -52,6 +52,7 @@ public class SpaceInv extends Game{
     private double increaseSpeed;
     private double sizeE;
 
+    private int life;
     private double korekta;
 
     //audio
@@ -127,6 +128,7 @@ public class SpaceInv extends Game{
         moveEnemy =((WIDTH-2*korekta)/10.0)*0.02;
         increaseSpeed=((WIDTH-2*korekta)/10.0)*0.02;
         sizeE=40;
+        life=3;
 
         SPEED = 30;
         gamePane = new Pane();
@@ -202,6 +204,7 @@ public class SpaceInv extends Game{
         moveEnemy =((WIDTH-2*korekta)/10.0)*0.02;
         increaseSpeed=((WIDTH-2*korekta)/10.0)*0.02;
         sizeE=40;
+        life=3;
     }
 
     private EventHandler<KeyEvent> stworzEH(){
@@ -281,30 +284,53 @@ public class SpaceInv extends Game{
 
     public static class Explosion extends Thread {
         Enemy x;
+        Ship y;
 
         public Explosion(Enemy x){this.x=x;}
+        public Explosion(Ship y){this.y=y;}
         @Override
         public void run() {
-            switch (x.type){
-                case 1: x.setFill(explosionG);
-                    break;
-                case 2: x.setFill(explosionG);
-                    break;
-                case 3: x.setFill(explosionB);
-                    break;
-                case 4: x.setFill(explosionB);
-                    break;
-                case 5: x.setFill(explosionF);
-                    break;
-                default: x.setFill(explosion);
-                    break;
+            if(y==null) {
+                switch (x.type) {
+                    case 1:
+                        x.setFill(explosionG);
+                        break;
+                    case 2:
+                        x.setFill(explosionG);
+                        break;
+                    case 3:
+                        x.setFill(explosionB);
+                        break;
+                    case 4:
+                        x.setFill(explosionB);
+                        break;
+                    case 5:
+                        x.setFill(explosionF);
+                        break;
+                    default:
+                        x.setFill(explosion);
+                        break;
+                }
+                try {
+                    sleep(150);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    x.setVisible(false);
+                }
             }
-            try {
-                sleep(150);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally{
-                x.setVisible(false);
+            else{
+                try {
+                    sleep(170);
+                    y.setVisible(true);
+                    sleep(150);
+                    y.setVisible(false);
+                    sleep(150);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    y.setVisible(true);
+                }
             }
         }
     }
@@ -372,7 +398,11 @@ public class SpaceInv extends Game{
                         i.setVisible(false);
                         //dodaje do listy elementow do usuniecia
                         removeBE.add(i);
-                        gameOver();
+                        life--;
+                        if(life==0){gameOver();}
+                        else{
+                            new Explosion(gracz).start();
+                        }
                     }
                 }
             }
@@ -581,7 +611,7 @@ public class SpaceInv extends Game{
         }
         //jak statek strzela do gory
         boolean moveUp(){
-            if(currentY-moveU+(HEIGHT/10.0)*0.6>=0) {
+            if(currentY-moveU+(HEIGHT/10.0)*0.8>=0) {
                 currentY -= moveU;
                 setTranslateY(currentY);
                 return true;
