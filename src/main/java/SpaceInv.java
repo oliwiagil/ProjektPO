@@ -39,6 +39,7 @@ public class SpaceInv extends Game{
     private boolean canShot;
     private int time;
     private boolean nextWave;
+    private boolean pause;
 
     //wartosc true mowi w ktorym kierunku porusza sie statek
     private boolean left;
@@ -129,6 +130,7 @@ public class SpaceInv extends Game{
         increaseSpeed=((WIDTH-2*korekta)/10.0)*0.02;
         sizeE=40;
         life=3;
+        pause=false;
 
         SPEED = 30;
         gamePane = new Pane();
@@ -205,6 +207,7 @@ public class SpaceInv extends Game{
         increaseSpeed=((WIDTH-2*korekta)/10.0)*0.02;
         sizeE=40;
         life=3;
+        pause=false;
     }
 
     private EventHandler<KeyEvent> stworzEH(){
@@ -212,6 +215,7 @@ public class SpaceInv extends Game{
             @Override
             public void handle(KeyEvent wcisnieto) {
                 if(wcisnieto.getCode()== KeyCode.ESCAPE){System.exit(0);}
+                if(wcisnieto.getCode()== KeyCode.P){gamePause();}
                 //tylko gdy minal odpowiednio dlugi czas od ostatniego strzalu mozliwy jest strzal
                 if(canShot) {
                     if (wcisnieto.getCode() == KeyCode.SPACE) {
@@ -644,7 +648,14 @@ public class SpaceInv extends Game{
 
     @Override
     public void gamePause() {
-
+        if(!pause){
+            pause=true;
+            timeline.stop();
+        }
+        else{
+            pause=false;
+            timeline.play();
+        }
     }
 
     //@Override protected void finalize() throws Throwable{ System.out.println("Deleted SpaceInv"); }
