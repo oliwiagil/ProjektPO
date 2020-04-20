@@ -31,6 +31,7 @@ public class SpaceInv extends Game{
     private ArrayList<Bullet> bullets;
     private ArrayList<Bullet> bulletsEnemy;
     private ArrayList<Enemy> enemies;
+    private ArrayList<Ship> lives;
     private Scene scene;
 
     private Random random;
@@ -39,6 +40,7 @@ public class SpaceInv extends Game{
     private boolean canShot;
     private int time;
     private boolean nextWave;
+    private boolean pause;
 
     //wartosc true mowi w ktorym kierunku porusza sie statek
     private boolean left;
@@ -129,6 +131,7 @@ public class SpaceInv extends Game{
         increaseSpeed=((WIDTH-2*korekta)/10.0)*0.02;
         sizeE=40;
         life=3;
+        pause=false;
 
         SPEED = 30;
         gamePane = new Pane();
@@ -139,7 +142,6 @@ public class SpaceInv extends Game{
         Rectangle wallL=new Rectangle(5,HEIGHT,Color.GREY);
         Rectangle wallR=new Rectangle(5,HEIGHT,Color.GREY);
         wallL.setTranslateX(korekta-5);
-        //nie ma jeszcze dobrze dobranej wartosci, bo statek porusza sie o rozne jednostki, wiec zakres poruszania sie statku zmienia sie
         wallR.setTranslateX(WIDTH-korekta);
         gamePane.getChildren().add(wallL);
         gamePane.getChildren().add(wallR);
@@ -147,6 +149,7 @@ public class SpaceInv extends Game{
         bullets = new ArrayList<>();
         bulletsEnemy = new ArrayList<>();
         enemies = new ArrayList<>();
+        lives=new ArrayList<>();
         createEnemies();
 
         scene = new Scene(gamePane,WIDTH,HEIGHT);
@@ -160,6 +163,23 @@ public class SpaceInv extends Game{
 
         BackgroundFill backgroundFill = new BackgroundFill(Color.BLACK, null,null);
         gamePane.setBackground(new Background(backgroundFill));
+
+        if(korekta>((WIDTH - 2 * korekta) / 32.0)) {
+            for (int i = 0; i < life; i++) {
+                lives.add(new Ship());
+                lives.get(i).setTranslateX(korekta / 2 - ((WIDTH - 2 * korekta) / 32.0));
+                lives.get(i).setTranslateY(((HEIGHT / 10.0) * 0.2) * (i + 1) + i * ((HEIGHT / 10.0) * 0.4));
+                gamePane.getChildren().add(lives.get(i));
+            }
+        }
+        else{
+            for (int i = 0; i < life; i++) {
+                lives.add(new Ship());
+                lives.get(i).setTranslateX(-100);
+                lives.get(i).setTranslateY(-100);
+                gamePane.getChildren().add(lives.get(i));
+            }
+        }
     }
 
     public void startGame() throws Exception{
@@ -205,6 +225,11 @@ public class SpaceInv extends Game{
         increaseSpeed=((WIDTH-2*korekta)/10.0)*0.02;
         sizeE=40;
         life=3;
+        pause=false;
+
+        for(int i=0;i<life;i++){
+            lives.get(i).setVisible(true);
+        }
     }
 
     private EventHandler<KeyEvent> stworzEH(){
@@ -212,6 +237,7 @@ public class SpaceInv extends Game{
             @Override
             public void handle(KeyEvent wcisnieto) {
                 if(wcisnieto.getCode()== KeyCode.ESCAPE){System.exit(0);}
+                if(wcisnieto.getCode()== KeyCode.P){gamePause();}
                 //tylko gdy minal odpowiednio dlugi czas od ostatniego strzalu mozliwy jest strzal
                 if(canShot) {
                     if (wcisnieto.getCode() == KeyCode.SPACE) {
@@ -399,6 +425,7 @@ public class SpaceInv extends Game{
                         //dodaje do listy elementow do usuniecia
                         removeBE.add(i);
                         life--;
+                        lives.get(life).setVisible(false);
                         if(life==0){gameOver();}
                         else{
                             new Explosion(gracz).start();
@@ -546,11 +573,13 @@ public class SpaceInv extends Game{
         //obecna pozycja statku
         double currentX;
         //jednostaka o jaka sie przemieszcza
-        double move=((WIDTH-2*korekta)/10.0)*0.1;
+        double move;
+        double szerokosc;
 
         Ship(){
-            super(((WIDTH-2*korekta)/10.0)*0.6,(HEIGHT/10.0)*0.4);
-
+            super(((WIDTH-2*korekta)/16.0),(HEIGHT/10.0)*0.4);
+            szerokosc=((WIDTH-2*korekta)/16.0);
+            move=szerokosc/8;
             pattern = ship3b;
             this.setFill(pattern);
 
@@ -560,7 +589,7 @@ public class SpaceInv extends Game{
 
         void moveD() {
             //(WIDTH/10.0)*0.6 to wartosc szerokosci prostokata podana w konstruktorze super
-            if (currentX+ move+((WIDTH-2*korekta)/10.0)*0.6<=WIDTH-korekta) {
+            if (currentX+ move+szerokosc<=WIDTH-korekta) {
                 currentX += move;
                 setTranslateX(currentX);
             }
@@ -579,9 +608,9 @@ public class SpaceInv extends Game{
         }
 
         void setPosition(){
-            setTranslateX(WIDTH/2);
+            setTranslateX(WIDTH/2-szerokosc/2);
             setTranslateY(HEIGHT-(HEIGHT/10.0)*0.8);
-            currentX=WIDTH/2;
+            currentX=WIDTH/2-szerokosc/2;
         }
     }
 
@@ -593,7 +622,7 @@ public class SpaceInv extends Game{
         double moveD=(HEIGHT/10.0)*0.1;
 
         Bullet(double x){
-            super(((WIDTH-2*korekta)/10.0)*0.06,(HEIGHT/10.0)*0.4,Color.CHARTREUSE);
+            super(((WIDTH-2*korekta)/10.0)*0.06,(HEIGHT/10.0)*0.2,Color.CHARTREUSE);
             //poczatkowa pozycja x jest taka jak statku ktory wystrzeliwuje
             setTranslateX(x);
             //poczatkowa wysokosc pocisku
@@ -602,7 +631,7 @@ public class SpaceInv extends Game{
             gamePane.getChildren().add(this);
         }
         Bullet(double x,double y){
-            super(((WIDTH-2*korekta)/10.0)*0.06,(HEIGHT/10.0)*0.4,Color.WHITE);
+            super(((WIDTH-2*korekta)/10.0)*0.06,(HEIGHT/10.0)*0.2,Color.WHITE);
             //poczatkowa pozycja x jest taka jak statku ktory wystrzeliwuje
             setTranslateX(x);
             setTranslateY(y);
@@ -644,7 +673,14 @@ public class SpaceInv extends Game{
 
     @Override
     public void gamePause() {
-
+        if(!pause){
+            pause=true;
+            timeline.stop();
+        }
+        else{
+            pause=false;
+            timeline.play();
+        }
     }
 
     //@Override protected void finalize() throws Throwable{ System.out.println("Deleted SpaceInv"); }
