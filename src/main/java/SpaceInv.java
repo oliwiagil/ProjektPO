@@ -32,6 +32,7 @@ public class SpaceInv extends Game{
     private ArrayList<Bullet> bulletsEnemy;
     private ArrayList<Enemy> enemies;
     private ArrayList<Ship> lives;
+    private ArrayList<Rectangle> score;
     private Scene scene;
 
     private Random random;
@@ -56,6 +57,7 @@ public class SpaceInv extends Game{
 
     private int life;
     private double korekta;
+    private int scoreI;
 
     //audio
     //https://archive.org/details/RIFLEGUNTIKKAT3TACTICALSHOT01
@@ -80,6 +82,16 @@ public class SpaceInv extends Game{
     static ImagePattern explosionB = new ImagePattern(new Image("file:media/SpaceInv/explosion2b.PNG"));
     static ImagePattern explosionG = new ImagePattern(new Image("file:media/SpaceInv/explosion2g.PNG"));
     static ImagePattern explosionF = new ImagePattern(new Image("file:media/SpaceInv/explosion2f.PNG"));
+    ImagePattern zero = new ImagePattern(new Image("file:media/SpaceInv/zero.PNG"));
+    ImagePattern jeden = new ImagePattern(new Image("file:media/SpaceInv/jeden.PNG"));
+    ImagePattern dwa = new ImagePattern(new Image("file:media/SpaceInv/dwa.PNG"));
+    ImagePattern trzy = new ImagePattern(new Image("file:media/SpaceInv/trzy.PNG"));
+    ImagePattern cztery = new ImagePattern(new Image("file:media/SpaceInv/cztery.PNG"));
+    ImagePattern piec = new ImagePattern(new Image("file:media/SpaceInv/piec.PNG"));
+    ImagePattern szesc = new ImagePattern(new Image("file:media/SpaceInv/szesc.PNG"));
+    ImagePattern siedem = new ImagePattern(new Image("file:media/SpaceInv/siedem.PNG"));
+    ImagePattern osiem = new ImagePattern(new Image("file:media/SpaceInv/osiem.PNG"));
+    ImagePattern dziewiec = new ImagePattern(new Image("file:media/SpaceInv/dziewiec.PNG"));
 
     SpaceInv(MainStage st){
 
@@ -132,24 +144,18 @@ public class SpaceInv extends Game{
         sizeE=40;
         life=3;
         pause=false;
+        scoreI=0;
 
         SPEED = 30;
         gamePane = new Pane();
         gracz=new Ship();
         gamePane.getChildren().add(gracz);
 
-        //dodaje sciany (tylko uwidaczniaja istniejace ograniczenia)
-        Rectangle wallL=new Rectangle(5,HEIGHT,Color.GREY);
-        Rectangle wallR=new Rectangle(5,HEIGHT,Color.GREY);
-        wallL.setTranslateX(korekta-5);
-        wallR.setTranslateX(WIDTH-korekta);
-        gamePane.getChildren().add(wallL);
-        gamePane.getChildren().add(wallR);
-
         bullets = new ArrayList<>();
         bulletsEnemy = new ArrayList<>();
         enemies = new ArrayList<>();
         lives=new ArrayList<>();
+        score=new ArrayList<>();
         createEnemies();
 
         scene = new Scene(gamePane,WIDTH,HEIGHT);
@@ -164,6 +170,19 @@ public class SpaceInv extends Game{
         BackgroundFill backgroundFill = new BackgroundFill(Color.BLACK, null,null);
         gamePane.setBackground(new Background(backgroundFill));
 
+        createInf();
+    }
+
+    public void createInf(){
+        //dodaje sciany (tylko uwidaczniaja istniejace ograniczenia)
+        Rectangle wallL=new Rectangle(5,HEIGHT,Color.GREY);
+        Rectangle wallR=new Rectangle(5,HEIGHT,Color.GREY);
+        wallL.setTranslateX(korekta-5);
+        wallR.setTranslateX(WIDTH-korekta);
+        gamePane.getChildren().add(wallL);
+        gamePane.getChildren().add(wallR);
+
+        //dodaje informacje o zyciach
         if(korekta>((WIDTH - 2 * korekta) / 32.0)) {
             for (int i = 0; i < life; i++) {
                 lives.add(new Ship());
@@ -179,6 +198,87 @@ public class SpaceInv extends Game{
                 lives.get(i).setTranslateY(-100);
                 gamePane.getChildren().add(lives.get(i));
             }
+        }
+
+        //score
+        for(int i=0;i<3;i++){
+            //trzeba jeszcze dobrze dobrac przesuniecia
+            score.add(new Rectangle((korekta-korekta/2)/3,(5*(korekta/3))/6));
+            score.get(i).setTranslateX(korekta/10+i*(korekta/3));
+            //
+            score.get(i).setTranslateY((((HEIGHT / 10.0) * 0.2) * (life + 1) + life * ((HEIGHT / 10.0) * 0.4))*2);
+            score.get(i).setFill(zero);
+            gamePane.getChildren().add(score.get(i));
+        }
+    }
+
+    public void scoreAkt(){
+        if((scoreI%10)==1){
+            score.get(2).setFill(jeden);
+        } else if((scoreI%10)==2){
+            score.get(2).setFill(dwa);
+        } else if((scoreI%10)==3){
+            score.get(2).setFill(trzy);
+        } else if((scoreI%10)==4){
+            score.get(2).setFill(cztery);
+        } else if((scoreI%10)==5){
+            score.get(2).setFill(piec);
+        } else if((scoreI%10)==6){
+            score.get(2).setFill(szesc);
+        } else if((scoreI%10)==7){
+            score.get(2).setFill(siedem);
+        } else if((scoreI%10)==8){
+            score.get(2).setFill(osiem);
+        } else if((scoreI%10)==9){
+            score.get(2).setFill(dziewiec);
+        } else if((scoreI%10)==0){
+            score.get(2).setFill(zero);
+        }
+
+        int tmp=scoreI/10;
+        if((tmp%10)==1){
+            score.get(1).setFill(jeden);
+        } else if((tmp%10)==2){
+            score.get(1).setFill(dwa);
+        } else if((tmp%10)==3){
+            score.get(1).setFill(trzy);
+        } else if((tmp%10)==4){
+            score.get(1).setFill(cztery);
+        } else if((tmp%10)==5){
+            score.get(1).setFill(piec);
+        } else if((tmp%10)==6){
+            score.get(1).setFill(szesc);
+        } else if((tmp%10)==7){
+            score.get(1).setFill(siedem);
+        } else if((tmp%10)==8){
+            score.get(1).setFill(osiem);
+        } else if((tmp%10)==9){
+            score.get(1).setFill(dziewiec);
+        } else if((tmp%10)==0){
+            score.get(1).setFill(zero);
+        }
+
+        tmp=tmp/10;
+        if((tmp%10)==1){
+            score.get(0).setFill(jeden);
+        } else if((tmp%10)==2){
+            score.get(0).setFill(dwa);
+        } else if((tmp%10)==3){
+            score.get(0).setFill(trzy);
+        } else if((tmp%10)==4){
+            score.get(0).setFill(cztery);
+        } else if((tmp%10)==5){
+            score.get(0).setFill(piec);
+        } else if((tmp%10)==6){
+            score.get(0).setFill(szesc);
+        } else if((tmp%10)==7){
+            score.get(0).setFill(siedem);
+        } else if((tmp%10)==8){
+            score.get(0).setFill(osiem);
+        } else if((tmp%10)==9){
+            score.get(0).setFill(dziewiec);
+        } else if((tmp%10)==0){
+            score.get(0).setFill(zero);
         }
     }
 
@@ -226,6 +326,8 @@ public class SpaceInv extends Game{
         sizeE=40;
         life=3;
         pause=false;
+        scoreI=0;
+        scoreAkt();
 
         for(int i=0;i<life;i++){
             lives.get(i).setVisible(true);
@@ -383,6 +485,8 @@ public class SpaceInv extends Game{
                     //jezeli jakis pocisk trafil przeciwnika
                     if (i.getBoundsInParent().intersects(j.getBoundsInParent())) {
                         sound1.play();
+                        scoreI+=j.points;
+                        scoreAkt();
                         //ukrywam pocisk i przeciwnika
                         new Explosion(j).start();
                         i.setVisible(false);
@@ -520,22 +624,29 @@ public class SpaceInv extends Game{
         double currentX;
         double currentY;
         int type;
+        int points;
         double moveDown=((WIDTH-2*korekta)/10.0)*0.2;
 
         Enemy(double x, double y, int type){
             super(((WIDTH-2*korekta)/10.0)*0.6,(HEIGHT/10.0)*0.4);
             switch (type){
                 case 1: pattern = enemy2g;
+                        points=3;
                         break;
                 case 2: pattern = enemy1g;
+                        points=2;
                         break;
                 case 3: pattern = enemy1b;
+                        points=2;
                         break;
                 case 4: pattern = enemy3b;
+                        points=1;
                         break;
                 case 5: pattern = enemy3f;
+                        points=1;
                         break;
                 default: pattern = enemy1b;
+                        points=2;
                         break;
             }
             this.type=type;
