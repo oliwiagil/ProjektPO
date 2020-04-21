@@ -335,7 +335,7 @@ public class SpaceInv extends Game{
     }
 
     private EventHandler<KeyEvent> stworzEH(){
-        eventHandler = new EventHandler<KeyEvent>() {
+        eventHandler = new EventHandler<>() {
             @Override
             public void handle(KeyEvent wcisnieto) {
                 if(wcisnieto.getCode()== KeyCode.ESCAPE){System.exit(0);}
@@ -365,7 +365,7 @@ public class SpaceInv extends Game{
     }
 
     private EventHandler<KeyEvent> stworzEH2(){
-        eventHandler2 = new EventHandler<KeyEvent>() {
+        eventHandler2 = new EventHandler<>() {
             @Override
             public void handle(KeyEvent puszczono) {
                 if (puszczono.getCode() == KeyCode.LEFT || puszczono.getCode() == KeyCode.A) {
@@ -413,8 +413,10 @@ public class SpaceInv extends Game{
     public static class Explosion extends Thread {
         Enemy x;
         Ship y;
+        long t;
 
-        public Explosion(Enemy x){this.x=x;}
+
+        public Explosion(Enemy x, long t){this.x=x; this.t=t;}
         public Explosion(Ship y){this.y=y;}
         @Override
         public void run() {
@@ -440,7 +442,7 @@ public class SpaceInv extends Game{
                         break;
                 }
                 try {
-                    sleep(150);
+                    sleep(t);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
@@ -488,7 +490,7 @@ public class SpaceInv extends Game{
                         scoreI+=j.points;
                         scoreAkt();
                         //ukrywam pocisk i przeciwnika
-                        new Explosion(j).start();
+                        new Explosion(j,(long) ((j.szerokoscE/moveEnemy)*5)).start();
                         i.setVisible(false);
                         //dodaje do listy elementow do usuniecia
                         removeB.add(i);
@@ -625,10 +627,12 @@ public class SpaceInv extends Game{
         double currentY;
         int type;
         int points;
+        double szerokoscE;
         double moveDown=((WIDTH-2*korekta)/10.0)*0.2;
 
         Enemy(double x, double y, int type){
             super(((WIDTH-2*korekta)/10.0)*0.6,(HEIGHT/10.0)*0.4);
+            szerokoscE=((WIDTH-2*korekta)/10.0)*0.6;
             switch (type){
                 case 1: pattern = enemy2g;
                         points=3;
