@@ -34,14 +34,15 @@ public class SpaceInv extends Game{
     private ArrayList<Ship> lives;
     private ArrayList<Rectangle> score;
     private Scene scene;
-
     private Random random;
 
     //zmienne odpowiedzialne za to zeby nie mozliwe bylo strzelanie jednym ciagiem
     private boolean canShot;
     private int time;
-    private boolean nextWave;
+    private int level;
     private boolean pause;
+    private boolean win;
+    private int cykl;
 
     //wartosc true mowi w ktorym kierunku porusza sie statek
     private boolean left;
@@ -107,11 +108,11 @@ public class SpaceInv extends Game{
                 String temp2 = line.substring(pos + 1);
                 switch(temp1){
                     case "difficulty":
-                            switch(temp2){
-                                case "EASY": difficulty = DIFFICULTY.EASY; break;
-                                case "NORMAL": difficulty = DIFFICULTY.NORMAL; break;
-                                case "HARD": difficulty = DIFFICULTY.HARD; break;
-                            }
+                        switch(temp2){
+                            case "EASY": difficulty = DIFFICULTY.EASY; break;
+                            case "NORMAL": difficulty = DIFFICULTY.NORMAL; break;
+                            case "HARD": difficulty = DIFFICULTY.HARD; break;
+                        }
                         break;
                     case "height":
                         HEIGHT = Double.parseDouble(temp2);
@@ -120,10 +121,10 @@ public class SpaceInv extends Game{
                         WIDTH = Double.parseDouble(temp2);
                         break;
                     case "fullscreen":
-                            switch(temp2){
-                                case "true": fullScreen = true; break;
-                                case "false": fullScreen = false; break;
-                            }
+                        switch(temp2){
+                            case "true": fullScreen = true; break;
+                            case "false": fullScreen = false; break;
+                        }
                         break;
                 }
             }
@@ -139,14 +140,6 @@ public class SpaceInv extends Game{
             korekta=(WIDTH-HEIGHT)/2;
         }
 
-        moveEnemy =((WIDTH-2*korekta)/10.0)*0.02;
-        increaseSpeed=((WIDTH-2*korekta)/10.0)*0.02;
-        sizeE=40;
-        life=3;
-        pause=false;
-        scoreI=0;
-
-        SPEED = 30;
         gamePane = new Pane();
         gracz=new Ship();
         gamePane.getChildren().add(gracz);
@@ -156,21 +149,37 @@ public class SpaceInv extends Game{
         enemies = new ArrayList<>();
         lives=new ArrayList<>();
         score=new ArrayList<>();
-        createEnemies();
+        random = new Random();
 
         scene = new Scene(gamePane,WIDTH,HEIGHT);
-
-        random = new Random();
-        canShot=true;
-        nextWave=false;
-        left=false;
-        right=false;
-        space=false;
 
         BackgroundFill backgroundFill = new BackgroundFill(Color.BLACK, null,null);
         gamePane.setBackground(new Background(backgroundFill));
 
+        setVariables();
         createInf();
+    }
+
+    public void setVariables(){
+        SPEED = 30;
+        moveEnemy =((WIDTH-2*korekta)/10.0)*0.02;
+        increaseSpeed=((WIDTH-2*korekta)/10.0)*0.02;
+        sizeE=40;
+        life=3;
+        scoreI=0;
+        level=0;
+        canShot=true;
+        left=false;
+        right=false;
+        space=false;
+        win=false;
+        pause=false;
+
+        switch(difficulty){
+            case EASY: cykl=6; break;
+            case NORMAL: cykl=9; break;
+            case HARD: cykl=12; break;
+        }
     }
 
     public void createInf(){
@@ -282,6 +291,31 @@ public class SpaceInv extends Game{
         }
     }
 
+    public void resetGame(){
+        for(Bullet b: bullets){
+            b.setVisible(false);
+        }
+        for(Bullet b: bulletsEnemy){
+            b.setVisible(false);
+        }
+        for(Enemy e: enemies){
+            e.setVisible(false);
+        }
+        bullets.clear();
+        bulletsEnemy.clear();
+        enemies.clear();
+
+        setVariables();
+        scoreAkt();
+        createEnemies(0);
+        gracz.setVisible(true);
+        gracz.setPosition();
+
+        for(int i=0;i<life;i++){
+            lives.get(i).setVisible(true);
+        }
+    }
+
     public void startGame() throws Exception{
         //pierwszy EH obsluguje wcisniete klawisze, a drugi puszczone
         gameStage.addEventHandler(KeyEvent.KEY_PRESSED,stworzEH());
@@ -298,42 +332,6 @@ public class SpaceInv extends Game{
         uplywczasu();
     }
 
-    public void resetGame(){
-        for(Bullet b: bullets){
-            b.setVisible(false);
-        }
-        for(Bullet b: bulletsEnemy){
-            b.setVisible(false);
-        }
-        for(Enemy e: enemies){
-            e.setVisible(false);
-        }
-        bullets.clear();
-        bulletsEnemy.clear();
-        enemies.clear();
-
-        createEnemies();
-        gracz.setVisible(true);
-        gracz.setPosition();
-        canShot=true;
-        nextWave=false;
-        left=false;
-        right=false;
-        space=false;
-
-        moveEnemy =((WIDTH-2*korekta)/10.0)*0.02;
-        increaseSpeed=((WIDTH-2*korekta)/10.0)*0.02;
-        sizeE=40;
-        life=3;
-        pause=false;
-        scoreI=0;
-        scoreAkt();
-
-        for(int i=0;i<life;i++){
-            lives.get(i).setVisible(true);
-        }
-    }
-
     private EventHandler<KeyEvent> stworzEH(){
         eventHandler = new EventHandler<>() {
             @Override
@@ -346,13 +344,7 @@ public class SpaceInv extends Game{
                         space=true;
                     }
                 }
-                if(wcisnieto.getCode()==KeyCode.ENTER) {
-                    //wszyscy zostali trafieni, nowa rozgrywka
-                    if (enemies.isEmpty()) {
-                        nextWave=true;
-                    }
-                }
-                else if (wcisnieto.getCode() == KeyCode.LEFT || wcisnieto.getCode() == KeyCode.A) {
+                if (wcisnieto.getCode() == KeyCode.LEFT || wcisnieto.getCode() == KeyCode.A) {
                     //kierunkiem poruszania sie statku jest lewo
                     left=true;
                 } else if (wcisnieto.getCode() == KeyCode.RIGHT || wcisnieto.getCode() == KeyCode.D) {
@@ -393,15 +385,16 @@ public class SpaceInv extends Game{
                         event -> {
                             ruch();
                             //po odpowiednim czasie umozliwia kolejny strzal
-                            if(!canShot) {
-                                time++;
-                                //po uplynieciu osmiu cykli mozliwy jest kolejny strzal
-                                if(time%8==0){
-                                    time=0;
-                                    canShot=true;
+                            if(!win) {
+                                if (!canShot) {
+                                    time++;
+                                    //po uplynieciu cykl cykli mozliwy jest kolejny strzal
+                                    if (time % cykl == 0) {
+                                        time = 0;
+                                        canShot = true;
+                                    }
                                 }
                             }
-
                         }
                 )
         );
@@ -471,10 +464,10 @@ public class SpaceInv extends Game{
         else if(right){gracz.moveD();}
         if(space&&canShot){gracz.shot(); canShot=false;}
 
-        //jezeli wcisnieto wczesniej enter oraz nie ma juz pociskow i przeciwnikow na planszy to tworzeni sa nowi
-        //if(nextWave){ if(bullets.isEmpty()){createEnemies(); nextWave=false;} }
         if(enemies.isEmpty()) {
-            gameWin();
+            canShot=false;
+            win=true;
+            if(bullets.isEmpty()&&bulletsEnemy.isEmpty()){gameWin();}
         }
 
         ArrayList<Bullet> removeB=new ArrayList<>();
@@ -608,7 +601,7 @@ public class SpaceInv extends Game{
         if(moveS){moveS=false;}
     }
 
-    private void createEnemies(){
+    private void createEnemies(double x){
         //liczba rzedow przeciwnikow
         int k=5;
         //odstep w pionie
@@ -617,7 +610,7 @@ public class SpaceInv extends Game{
         double end=(((WIDTH-2*korekta)/10)*0.9);
         for(double j=gap;j<=k*gap;j=j+gap) {
             for (double i = start+korekta+end; i < WIDTH-korekta-end; i = i + end) {
-                gamePane.getChildren().add(new Enemy(i, j, (int) j/gap));
+                gamePane.getChildren().add(new Enemy(i, j+x, (int) j/gap));
             }
         }
     }
@@ -635,23 +628,23 @@ public class SpaceInv extends Game{
             szerokoscE=((WIDTH-2*korekta)/10.0)*0.6;
             switch (type){
                 case 1: pattern = enemy2g;
-                        points=3;
-                        break;
+                    points=3;
+                    break;
                 case 2: pattern = enemy1g;
-                        points=2;
-                        break;
+                    points=2;
+                    break;
                 case 3: pattern = enemy1b;
-                        points=2;
-                        break;
+                    points=2;
+                    break;
                 case 4: pattern = enemy3b;
-                        points=1;
-                        break;
+                    points=1;
+                    break;
                 case 5: pattern = enemy3f;
-                        points=1;
-                        break;
+                    points=1;
+                    break;
                 default: pattern = enemy1b;
-                        points=2;
-                        break;
+                    points=2;
+                    break;
             }
             this.type=type;
             this.setFill(pattern);
@@ -781,9 +774,19 @@ public class SpaceInv extends Game{
     }
 
     public void gameWin(){
-        soundWin.play();
-        timeline.stop();
-        returnMain.winStage.show();
+        level++;
+        if(level!=8){
+            createEnemies(level*((HEIGHT/10.0)*0.4));
+            canShot=true;
+            win=false;
+            moveEnemy =((WIDTH-2*korekta)/10.0)*0.02;
+            sizeE=40;
+        }
+        else {
+            soundWin.play();
+            timeline.stop();
+            returnMain.winStage.show();
+        }
     }
 
     @Override
