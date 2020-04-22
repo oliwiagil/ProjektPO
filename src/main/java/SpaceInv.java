@@ -210,14 +210,24 @@ public class SpaceInv extends Game{
         }
 
         //score
-        for(int i=0;i<3;i++){
-            //trzeba jeszcze dobrze dobrac przesuniecia
-            score.add(new Rectangle((korekta-korekta/2)/3,(5*(korekta/3))/6));
-            score.get(i).setTranslateX(korekta/10+i*(korekta/3));
-            //
-            score.get(i).setTranslateY((((HEIGHT / 10.0) * 0.2) * (life + 1) + life * ((HEIGHT / 10.0) * 0.4))*2);
-            score.get(i).setFill(zero);
-            gamePane.getChildren().add(score.get(i));
+        double x=(2*(korekta-5))/9;
+        if(x>5) {
+            for (int i = 0; i < 3; i++) {
+                score.add(new Rectangle(x, (5 * (korekta / 3)) / 6));
+                score.get(i).setTranslateX(x / 2 + i * x + i * (x / 4));
+                score.get(i).setTranslateY((((HEIGHT / 10.0) * 0.2) * (life + 1) + life * ((HEIGHT / 10.0) * 0.4)) * 2);
+                score.get(i).setFill(zero);
+                gamePane.getChildren().add(score.get(i));
+            }
+        }
+        else{
+            for (int i = 0; i < 3; i++) {
+                score.add(new Rectangle(x, (5 * (korekta / 3)) / 6));
+                score.get(i).setTranslateX(-100);
+                score.get(i).setTranslateY(-100);
+                score.get(i).setFill(zero);
+                gamePane.getChildren().add(score.get(i));
+            }
         }
     }
 
