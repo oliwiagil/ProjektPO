@@ -59,6 +59,8 @@ public class SpaceInv extends Game{
     private int life;
     private double korekta;
     private int scoreI;
+    private static boolean next=false;
+    private boolean gameR =true;
 
     //audio
     //https://archive.org/details/RIFLEGUNTIKKAT3TACTICALSHOT01
@@ -93,6 +95,7 @@ public class SpaceInv extends Game{
     ImagePattern siedem = new ImagePattern(new Image("file:media/SpaceInv/siedem.PNG"));
     ImagePattern osiem = new ImagePattern(new Image("file:media/SpaceInv/osiem.PNG"));
     ImagePattern dziewiec = new ImagePattern(new Image("file:media/SpaceInv/dziewiec.PNG"));
+    ImagePattern nextWave = new ImagePattern(new Image("file:media/SpaceInv/nextWave.PNG"));
 
     SpaceInv(MainStage st){
 
@@ -174,6 +177,8 @@ public class SpaceInv extends Game{
         space=false;
         win=false;
         pause=false;
+        gameR =true;
+        next=false;
 
         switch(difficulty){
             case EASY: cykl=6; break;
@@ -413,17 +418,20 @@ public class SpaceInv extends Game{
         timeline.play();
     }
 
-    public static class Explosion extends Thread {
+    public class Explosion extends Thread {
         Enemy x;
         Ship y;
+        Rectangle z;
         long t;
 
 
         public Explosion(Enemy x, long t){this.x=x; this.t=t;}
         public Explosion(Ship y){this.y=y;}
+        public Explosion(Rectangle z){this.z=z;}
         @Override
         public void run() {
-            if(y==null) {
+            //przeciwnik trafiony
+            if(y==null&&z==null) {
                 switch (x.type) {
                     case 1:
                         x.setFill(explosionG);
@@ -452,7 +460,8 @@ public class SpaceInv extends Game{
                     x.setVisible(false);
                 }
             }
-            else{
+            //statek trafiony
+            else if(x==null&&z==null){
                 try {
                     sleep(170);
                     y.setVisible(true);
@@ -465,6 +474,17 @@ public class SpaceInv extends Game{
                     y.setVisible(true);
                 }
             }
+            //wyswietlenie komunikatu next wave
+            else if(x==null&&y==null){
+                try {
+                    sleep(800);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    z.setVisible(false);
+                    next=true;
+                }
+            }
         }
     }
 
@@ -475,9 +495,21 @@ public class SpaceInv extends Game{
         if(space&&canShot){gracz.shot(); canShot=false;}
 
         if(enemies.isEmpty()) {
-            canShot=false;
-            win=true;
-            if(bullets.isEmpty()&&bulletsEnemy.isEmpty()){gameWin();}
+            if(next){
+                next=false;
+                createEnemies(level*((HEIGHT/10.0)*0.4));
+                gameR =true;
+                win=false;
+                canShot=true;
+            }
+            else if(gameR){
+                canShot = false;
+                win = true;
+                if (bullets.isEmpty() && bulletsEnemy.isEmpty()) {
+                    gameWin();
+                    //od tego momentu do next=true, gameR ma wartosc false, wtedy tez nie zwiekszana jest predkosc poruszania wrogow
+                }
+            }
         }
 
         ArrayList<Bullet> removeB=new ArrayList<>();
@@ -569,10 +601,13 @@ public class SpaceInv extends Game{
                 }
             }
         }
-        //co 10 trafionych wrogow, zwieksza sie szybkosc ich poruszania
-        if(enemies.size()<=sizeE){
-            sizeE-=10;
-            moveEnemy+=increaseSpeed;
+        //zeby predkosc nie byla zwiekszana jak w czasie czekania na kolejna runde
+        if(gameR) {
+            //co 10 trafionych wrogow, zwieksza sie szybkosc ich poruszania
+            if (enemies.size() <= sizeE) {
+                sizeE -= 10;
+                moveEnemy += increaseSpeed;
+            }
         }
 
         //przemieszczenie wszystkich wrogow w lewo lub w prawo
@@ -784,13 +819,19 @@ public class SpaceInv extends Game{
     }
 
     public void gameWin(){
+        gameR =false;
         level++;
         if(level!=8){
-            createEnemies(level*((HEIGHT/10.0)*0.4));
-            canShot=true;
-            win=false;
             moveEnemy =((WIDTH-2*korekta)/10.0)*0.02;
             sizeE=40;
+
+            Rectangle nextW = new Rectangle((WIDTH - 2 * korekta) / 5, HEIGHT / 10);
+            nextW.setFill(nextWave);
+            gamePane.getChildren().add(nextW);
+            nextW.setTranslateX(WIDTH / 2 - ((WIDTH - 2 * korekta) / 5) / 2);
+            nextW.setTranslateY(HEIGHT / 2 - HEIGHT / 20);
+            new Explosion(nextW).start();
+
         }
         else {
             soundWin.play();
