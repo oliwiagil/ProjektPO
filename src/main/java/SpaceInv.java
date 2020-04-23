@@ -96,6 +96,7 @@ public class SpaceInv extends Game{
     ImagePattern osiem = new ImagePattern(new Image("file:media/SpaceInv/osiem.PNG"));
     ImagePattern dziewiec = new ImagePattern(new Image("file:media/SpaceInv/dziewiec.PNG"));
     ImagePattern nextWave = new ImagePattern(new Image("file:media/SpaceInv/nextWave.PNG"));
+    ImagePattern pointsInf = new ImagePattern(new Image("file:media/SpaceInv/points.PNG"));
 
     SpaceInv(MainStage st){
 
@@ -196,12 +197,20 @@ public class SpaceInv extends Game{
         gamePane.getChildren().add(wallL);
         gamePane.getChildren().add(wallR);
 
+        //dodaje informacje o wartosci punktowej przeciwnikow
+        if(korekta-5>50) {
+            Rectangle pointsI = new Rectangle(korekta - 5, ((korekta - 5) * 972) / 1110);
+            pointsI.setFill(pointsInf);
+            pointsI.setTranslateY(HEIGHT - (((korekta - 5) * 972) / 1110));
+            gamePane.getChildren().add(pointsI);
+        }
+
         //dodaje informacje o zyciach
         if(korekta>((WIDTH - 2 * korekta) / 32.0)) {
             for (int i = 0; i < life; i++) {
                 lives.add(new Ship());
                 lives.get(i).setTranslateX(korekta / 2 - ((WIDTH - 2 * korekta) / 32.0));
-                lives.get(i).setTranslateY(((HEIGHT / 10.0) * 0.2) * (i + 1) + i * ((HEIGHT / 10.0) * 0.4));
+                lives.get(i).setTranslateY(((HEIGHT / 10.0) * 0.2)+((HEIGHT / 10.0) * 0.2) * (i + 1) + i * ((HEIGHT / 10.0) * 0.4));
                 gamePane.getChildren().add(lives.get(i));
             }
         }
