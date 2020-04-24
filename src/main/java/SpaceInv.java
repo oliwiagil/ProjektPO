@@ -55,6 +55,8 @@ public class SpaceInv extends Game{
     private double moveEnemy;
     private double increaseSpeed;
     private double sizeE;
+    private double enemyMoveDown;
+    private int enemyShootFrq;
 
     private int life;
     private double korekta;
@@ -97,6 +99,7 @@ public class SpaceInv extends Game{
     ImagePattern dziewiec = new ImagePattern(new Image("file:media/SpaceInv/dziewiec.PNG"));
     ImagePattern nextWave = new ImagePattern(new Image("file:media/SpaceInv/nextWave.PNG"));
     ImagePattern pointsInf = new ImagePattern(new Image("file:media/SpaceInv/points.PNG"));
+    ImagePattern controls = new ImagePattern(new Image("file:media/SpaceInv/controls2.PNG"));
 
     SpaceInv(MainStage st){
 
@@ -182,9 +185,9 @@ public class SpaceInv extends Game{
         next=false;
 
         switch(difficulty){
-            case EASY: cykl=6; break;
-            case NORMAL: cykl=9; break;
-            case HARD: cykl=12; break;
+            case EASY: cykl=6; enemyMoveDown =((WIDTH-2*korekta)/10.0)*0.2; enemyShootFrq=2; break;
+            case NORMAL: cykl=9; enemyMoveDown =((WIDTH-2*korekta)/10.0)*0.3; enemyShootFrq=3; break;
+            case HARD: cykl=12; enemyMoveDown =((WIDTH-2*korekta)/10.0)*0.4; enemyShootFrq=4; break;
         }
     }
 
@@ -196,6 +199,13 @@ public class SpaceInv extends Game{
         wallR.setTranslateX(WIDTH-korekta);
         gamePane.getChildren().add(wallL);
         gamePane.getChildren().add(wallR);
+
+        if(korekta-5>50) {
+            Rectangle contr = new Rectangle(korekta-5, ((korekta - 5) * 459) / 365);
+            contr.setFill(controls);
+            contr.setTranslateX(WIDTH - korekta + 5);
+            gamePane.getChildren().add(contr);
+        }
 
         //dodaje informacje o wartosci punktowej przeciwnikow
         if(korekta-5>50) {
@@ -530,7 +540,7 @@ public class SpaceInv extends Game{
                 for (Enemy j : enemies) {
                     //jezeli jakis pocisk trafil przeciwnika
                     if (i.getBoundsInParent().intersects(j.getBoundsInParent())) {
-                        sound1.play();
+                    //    sound1.play();
                         scoreI+=j.points;
                         scoreAkt();
                         //ukrywam pocisk i przeciwnika
@@ -594,7 +604,7 @@ public class SpaceInv extends Game{
 
         //losowo wybierani sa przeciwnicy ktorzy w tym ruchu strzelaja
         for(Enemy i : enemies){
-            if(random.nextInt(250)<1) {i.shot();}
+            if(random.nextInt(1000)<enemyShootFrq) {i.shot();}
             //sprawdzenie czy mozliwe jest dalsze poruszanie sie przeciwnikow w prawo
             if(moveR) {
                 if (i.currentX + moveEnemy + ((WIDTH - 2 * korekta) / 10.0) * 0.6 > WIDTH - korekta) {
@@ -675,7 +685,6 @@ public class SpaceInv extends Game{
         int type;
         int points;
         double szerokoscE;
-        double moveDown=((WIDTH-2*korekta)/10.0)*0.2;
 
         Enemy(double x, double y, int type){
             super(((WIDTH-2*korekta)/10.0)*0.6,(HEIGHT/10.0)*0.4);
@@ -725,7 +734,7 @@ public class SpaceInv extends Game{
             setTranslateX(currentX);
         }
         void moveS(){
-            currentY += moveDown;
+            currentY += enemyMoveDown;
             setTranslateY(currentY);
         }
 
@@ -763,7 +772,7 @@ public class SpaceInv extends Game{
             }
         }
         void shot(){
-            sound2.play();
+       //     sound2.play();
             //x jest zwiekszony o correction aby strzaly wychodzily ze srodka wrogow
             double correction=((WIDTH-2*korekta)/10.0)*0.28;
             bullets.add(new Bullet(currentX+correction));
@@ -822,7 +831,7 @@ public class SpaceInv extends Game{
     }
 
     public void gameOver(){
-        sound3.play();
+   //     sound3.play();
         timeline.stop();
         returnMain.overStage.show();
     }
