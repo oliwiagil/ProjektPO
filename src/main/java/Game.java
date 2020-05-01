@@ -1,6 +1,6 @@
+import Menu.MainStage;
 import javafx.animation.Timeline;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public abstract class Game {
