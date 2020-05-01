@@ -12,11 +12,15 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.awt.event.ActionEvent;
+
 public class SpaceInvMenu {
 
     SpaceInvMenu spaceInvMenu = null;
     MainMenu mainMenu = null;
     SpaceInv game = null;
+    Settings settings = null;
+
 
     Pane pane = null;
     Stage stage = null;
@@ -29,8 +33,9 @@ public class SpaceInvMenu {
         spaceInvMenu = this;
         stage = new Stage();
         mainMenu = menu;
+        settings = new Settings(spaceInvMenu);
+
         createMenu();
-        open();
     }
 
     public void open(){
@@ -76,6 +81,7 @@ public class SpaceInvMenu {
             lbl.setTextAlignment(TextAlignment.CENTER);
             lbl.setFont(Font.font("Serif", 20));
 
+            //Start Button //------------------------------------------------
             Button btnStart = new Button("Start");
             btnStart.setPrefWidth(btnWidth);
             btnStart.setMinWidth(btnWidth);
@@ -83,14 +89,21 @@ public class SpaceInvMenu {
                 startGame();
             });
 
+            //Settings Button //---------------------------------------------
             Button btnSett = new Button("Settings");
+            btnSett.setOnAction(ActionEvent->{
+                settings.open();
+                spaceInvMenu.close();
+            });
             btnSett.setPrefWidth(btnWidth);
             btnSett.setMinWidth(btnWidth);
 
+            //Scores Button //-----------------------------------------------
             Button btnScores = new Button("Scores");
             btnScores.setPrefWidth(btnWidth);
             btnScores.setMinWidth(btnWidth);
 
+            //Back Button //-------------------------------------------------
             Button btnBack = new Button("Back");
             btnBack.setPrefWidth(btnWidth);
             btnBack.setMinWidth(btnWidth);

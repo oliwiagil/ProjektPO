@@ -31,7 +31,6 @@ public class CheckersMenu{
         checkersMenu = this;
 
         createWindow();
-        open();
     }
 
     public void open(){

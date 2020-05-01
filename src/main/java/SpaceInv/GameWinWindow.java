@@ -30,6 +30,7 @@ public class GameWinWindow extends Stage {
 
     public void open(){
         show();
+        toFront();
     }
 
     public void close(){

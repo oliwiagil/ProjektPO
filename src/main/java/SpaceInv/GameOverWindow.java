@@ -31,6 +31,7 @@ public class GameOverWindow extends Stage {
 
     public void open(){
         show();
+        toFront();
     }
 
     public void close(){

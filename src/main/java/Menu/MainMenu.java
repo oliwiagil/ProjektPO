@@ -192,7 +192,7 @@ public class MainMenu {
             imageViewGMenager.setX(200);
             imageViewGMenager.setY(200);
 
-            Tooltip tipGMenager = new Tooltip("Additional information");
+            Tooltip tipGMenager = new Tooltip("Use it to drag menu through screen");
             Tooltip.install(imageViewGMenager, tipGMenager);
 
             this.add(imageViewGMenager);
