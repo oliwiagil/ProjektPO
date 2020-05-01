@@ -211,7 +211,11 @@ public class MainMenu {
             });
 
             imageViewCheckers.setOnMouseClicked(MouseEvent->{
-
+                if(checkersMenu == null){
+                    checkersMenu = new CheckersMenu(thisMainMenu);
+                }
+                checkersMenu.open();
+                thisMainMenu.close();
             });
 
             imageViewCheckers.setX(77);

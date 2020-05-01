@@ -25,7 +25,7 @@ public class Checkers {
     protected int SPEED;
     protected Pane gamePane;
     protected Timeline timeline;
-    protected MainStage returnMain;
+    protected CheckersMenu returnMenu;
 
     Scene scene;
     double pawnOrgX, pawnOrgY;
@@ -40,8 +40,8 @@ public class Checkers {
     private int[][] array;
 
     //konstruktor, tutaj tworzymy grę: jej stage(każdy obiekt gry ma swój), scene, i jakieś zmienne potrzebne
-    Checkers(MainStage mS){
-        returnMain = mS;
+    Checkers(CheckersMenu cM){
+        returnMenu = cM;
         gameStage = new Stage();
 
         gamePane = performBoard();
