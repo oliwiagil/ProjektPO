@@ -34,6 +34,7 @@ public class MainMenu {
     SpaceInvMenu spaceInvMenu = null;
     CheckersMenu checkersMenu = null;
     SnakeMenu snakeMenu = null;
+    Snake snake=null;
 
     MainMenu(Stage s){
 
@@ -240,7 +241,8 @@ public class MainMenu {
             });
 
             imageViewSnake.setOnMouseClicked(MouseEvent->{
-
+                snake = new Snake(thisMainMenu);
+                snake.startGame();
             });
 
             imageViewSnake.setX(326);
