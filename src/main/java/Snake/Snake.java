@@ -6,12 +6,12 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -30,9 +30,9 @@ public class Snake {
     public double HEIGHT;
     public Color TLO;
 
-    public boolean dziala=false;
-    boolean over=false;
-    public boolean wejscie=true;
+    public boolean dziala;
+    boolean over;
+    public boolean wejscie;
 
     Food food;
     //  public int czas=0;
@@ -50,6 +50,14 @@ public class Snake {
     Scene scene;
     public Stage gameStage;
 
+    ImagePattern foodP = new ImagePattern(new Image("file:media/food.PNG"));
+    ImagePattern snakeP = new ImagePattern(new Image("file:media/tail.PNG"));
+  //  ImagePattern headP = new ImagePattern(new Image("file:media/head.PNG"));
+    ImagePattern headW = new ImagePattern(new Image("file:media/headW.PNG"));
+    ImagePattern headS = new ImagePattern(new Image("file:media/headS.PNG"));
+    ImagePattern headA = new ImagePattern(new Image("file:media/headA.PNG"));
+    ImagePattern headD = new ImagePattern(new Image("file:media/headD.PNG"));
+
     public Snake(MainMenu menu){
         gameStage = new Stage();
         TLO=Color.YELLOWGREEN;
@@ -60,6 +68,9 @@ public class Snake {
         tab=new Rectangle[WID*HEI];
         waz=new SnakePlayer();
         food=new Food();
+        dziala=false;
+        over=false;
+        wejscie=true;
         scene=new Scene(gamePane,WIDTH,HEIGHT, TLO);
     }
 
@@ -70,7 +81,18 @@ public class Snake {
         gameStage.centerOnScreen();
         gameStage.setResizable(true);
         gameStage.show();
+        //zeby w EH uruchomic timeline
+        dziala=false;
+        over=false;
         uplywczasu();
+    }
+
+    public void resetGame(){
+        dziala=false;
+        for(int i=waz.size;i>=0;i--){
+            gamePane.getChildren().remove(tab[i]);
+        }
+        waz=new SnakePlayer();
     }
 
     public EventHandler<KeyEvent> stworzEH(){
@@ -78,14 +100,11 @@ public class Snake {
             @Override
             public void handle(KeyEvent wcisnieto) {
                 if(wcisnieto.getCode()==KeyCode.ESCAPE){System.exit(0);}
+                //albo pausa albo gra zostala przegrana
                 if(!dziala){
                     if(over){
-                        over=false;
-                        for(int i=waz.size;i>=0;i--){
-                            gamePane.getChildren().remove(tab[i]);
-                        }
-                        waz=new SnakePlayer();
-                        uplywczasu();
+                        resetGame();
+                        startGame();
                     }
                     dziala=true;
                     timeline.play();
@@ -172,6 +191,7 @@ public class Snake {
             } while(y==waz.y);
 
             foodSq=new Rectangle(2*WYMIAR,2*WYMIAR,Color.YELLOW);
+            foodSq.setFill(foodP);
             GridPane.setConstraints(foodSq, x, y);
             gamePane.getChildren().add(foodSq);
             food=this;
@@ -181,7 +201,8 @@ public class Snake {
                 //dodanie nowego ogona
                 for(int i=0;i<3;i++) {
                     waz.size++;
-                    tab[waz.size] = new Rectangle(2 * WYMIAR, 2 * WYMIAR, Color.BLACK);
+                    tab[waz.size] = new Rectangle(2 * WYMIAR, 2 * WYMIAR);
+                    tab[waz.size].setFill(snakeP);
                     GridPane.setConstraints(tab[waz.size], lastX, lastY);
                     gamePane.getChildren().add(tab[waz.size]);
                 }
@@ -206,12 +227,13 @@ public class Snake {
             size=0;
             x=WID/2;
             y= HEI /2;
-            tab[0]=new Rectangle(2*WYMIAR,2*WYMIAR,Color.BLUE);
+            tab[0]=new Rectangle(2*WYMIAR,2*WYMIAR);
             GridPane.setConstraints(tab[0], x, y);
             gamePane.getChildren().add(tab[0]);
             for(int i=0; i<3;i++) {
                 size++;
-                tab[size] = new Rectangle(2 * WYMIAR, 2 * WYMIAR, Color.BLACK);
+                tab[size] = new Rectangle(2 * WYMIAR, 2 * WYMIAR);
+                tab[size].setFill(snakeP);
                 GridPane.setConstraints(tab[size], x, y);
                 gamePane.getChildren().add(tab[size]);
             }
@@ -233,6 +255,7 @@ public class Snake {
 
         void moveD(){
             x++;
+            tab[0].setFill(headD);
             if(x>=WID||checkZderzenie(x,y)){
                 gameOver();
             }
@@ -242,6 +265,7 @@ public class Snake {
         }
         void moveW(){
             y--;
+            tab[0].setFill(headW);
             if(y<0||checkZderzenie(x,y)){
                 gameOver();
             }
@@ -251,6 +275,7 @@ public class Snake {
         }
         void moveA(){
             x--;
+            tab[0].setFill(headA);
             if(x<0||checkZderzenie(x,y)){
                 gameOver();
             }
@@ -260,6 +285,7 @@ public class Snake {
         }
         void moveS(){
             y++;
+            tab[0].setFill(headS);
             if(y>= HEI ||checkZderzenie(x,y)){
                 gameOver();
             }
