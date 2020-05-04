@@ -117,7 +117,7 @@ public class SpaceInv {
     ImagePattern dziewiec = new ImagePattern(new Image("file:media/SpaceInv/dziewiec.PNG"));
     ImagePattern nextWave = new ImagePattern(new Image("file:media/SpaceInv/nextWave.PNG"));
     ImagePattern pointsInf = new ImagePattern(new Image("file:media/SpaceInv/points.PNG"));
-    ImagePattern controls = new ImagePattern(new Image("file:media/SpaceInv/controls2.PNG"));
+    ImagePattern controls = new ImagePattern(new Image("file:media/SpaceInv/controls3.PNG"));
 
     SpaceInv(SpaceInvMenu sIm){
 
@@ -219,7 +219,7 @@ public class SpaceInv {
         gamePane.getChildren().add(wallR);
 
         if(korekta-5>50) {
-            Rectangle contr = new Rectangle(korekta-5, ((korekta - 5) * 459) / 365);
+            Rectangle contr = new Rectangle(korekta-5, ((korekta - 5) * 528) / 373);
             contr.setFill(controls);
             contr.setTranslateX(WIDTH - korekta + 5);
             gamePane.getChildren().add(contr);
