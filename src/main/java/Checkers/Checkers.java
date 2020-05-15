@@ -1,16 +1,19 @@
 package Checkers;
-
-import Menu.MainStage;
+;
 import javafx.animation.Timeline;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
 
 
 public class Checkers {
@@ -33,29 +36,38 @@ public class Checkers {
     private double translateX;
     private final int boardSize = 8;
     private int whiteAtBottom = 1;
-    private final int frameExtent = 660;
+    private final int frameExtent = 640;
     private final int squareSize = 80;
     private final int frameWidth = 10;
     private final int pawnRadius = 25;
     private int[][] array;
+
+    private Rectangle[][] fields;
+    private ArrayList<Pawn> blackPawns;
+    private ArrayList<Pawn> whitePawns;
+    private Rectangle frame;
+    private Image blackPawn = new Image("file:media/Checkers/blackPawn.png");
+    private Image whitePawn = new Image("file:media/Checkers/whitePawn.png");
 
     //konstruktor, tutaj tworzymy grę: jej stage(każdy obiekt gry ma swój), scene, i jakieś zmienne potrzebne
     Checkers(CheckersMenu cM){
         returnMenu = cM;
         gameStage = new Stage();
 
-        gamePane = performBoard();
         array = new int[8][8];
+        fields = new Rectangle[8][8];
+        blackPawns = new ArrayList<>();
+        whitePawns = new ArrayList<>();
+        gamePane = performBoard();
         setPieces(array, whiteAtBottom);
         scene = new Scene(gamePane);
-        System.out.println("dziala");
+        gameStage.setTitle("Checkers");
+        gameStage.setScene(scene);
     }
 
     //odpalamy grę, pokazujemy stage i włączamy czas
 
     public void startGame() throws Exception {
-        gameStage.setTitle("Checkers");
-        gameStage.setScene(scene);
         gameStage.show();
     }
 
@@ -87,69 +99,79 @@ public class Checkers {
 
     public Pane performBoard(){
         Pane board = new Pane();
-        Rectangle frame = new Rectangle(0, 0, frameExtent, frameExtent);
+        frame = new Rectangle(0, 0, frameExtent, frameExtent); //tam gdzie ustawimy frame tam będzie cała plansza, pionki i pola są ustawiane względem frame
         board.getChildren().addAll(frame);
+
         boolean blackOrWhite = true;
-        int i = 0,j = 0;
+        int i = 0, j = 0;
         while (i < boardSize) {
             while (j < boardSize) {
-                Rectangle square = new Rectangle(i*squareSize+frameWidth, j*squareSize+frameWidth, squareSize, squareSize);
                 if (blackOrWhite)
-                    square.setFill(Color.AZURE);
+                    fields[i][j] = new Field(i*squareSize+frame.getX(), j*squareSize+frame.getY(), squareSize, squareSize, Color.AZURE);
                 else
-                    square.setFill(Color.GREEN);
+                    fields[i][j] = new Field(i*squareSize+frame.getX(), j*squareSize+frame.getY(), squareSize, squareSize, Color.GREEN);
                 blackOrWhite = !blackOrWhite;
-                board.getChildren().add(square);
+                board.getChildren().add(fields[i][j]);
                 j++;
             }
             blackOrWhite = !blackOrWhite;
             j = 0;
             i++;
         }
+
         i = 0;
         j = 0;
         Color tempColor = Color.BLACK;
-        int height = (int) (frameWidth + 1.5*squareSize);
-        int width = (int)(frameWidth + 0.5*squareSize);
+        int height = (int) (frame.getX() + 1.5*squareSize);
+        int width = (int)(frame.getY() + 0.5*squareSize);
         while (j < 2) {
             while (i < boardSize) {
-                Circle pawn = setPawn(tempColor, board, height, width);
+                blackPawns.add(setPawn(blackPawn, height, width, j, i, true));
                 height += 2*squareSize;
                 i += 2;
             }
-            height = (int)(frameWidth + 0.5*squareSize);
+            height = (int)(frame.getX() + 0.5*squareSize);
             width += squareSize;
             i = 1;
             j++;
         }
+
         i = 0;
         j = 6;
         tempColor = Color.WHITE;
-        height = (int)(frameWidth + 1.5*squareSize);
-        width = (int)(frameWidth + 6.5*squareSize);
+        height = (int)(frame.getX() + 1.5*squareSize);
+        width = (int)(frame.getY() + 6.5*squareSize);
         while (j < boardSize) {
             while (i < boardSize) {
-                Circle pawn = setPawn(tempColor, board, height, width);
+                whitePawns.add(setPawn(whitePawn, height, width, j, i, false));
                 height += 2*squareSize;
                 i += 2;
             }
-            height = (int)(frameWidth + 0.5*squareSize);
+            height = (int)(frame.getX() + 0.5*squareSize);
             width += squareSize;
             i = 1;
             j++;
         }
+
+        for(Pawn a: blackPawns){
+            board.getChildren().add(a);
+        }
+
+        for(Pawn a: whitePawns){
+            board.getChildren().add(a);
+        }
+
         return board;
     }
 
-    Circle setPawn(Color tempColor, Pane board, int height, int width) {
-        Circle pawn = new Circle(height, width, 20);
-        pawn.setCursor(Cursor.HAND);
-        pawn.setOnMousePressed(pawnPositioning);
-        pawn.setOnMouseDragged(pawnMovement);
-//        pawn.setOnMouseReleased(idkIsAllowed); //powinna służyć do zaokrąglania pozycji, błąd w implementacji
-        pawn.setFill(tempColor);
-        board.getChildren().add(pawn);
-        return pawn;
+
+    Pawn setPawn(Image img, int width, int height, int arrX, int arrY, boolean col){
+        Pawn tempPawn = new Pawn(height, width, img, arrY, arrX, col);
+        tempPawn.setCursor(Cursor.HAND);
+        tempPawn.setOnMousePressed(pawnGetPosition);
+        tempPawn.setOnMouseDragged(pawnMovement);
+        tempPawn.setOnMouseReleased(pawnSetPosition);
+        return tempPawn;
     }
 
     void setPieces(int[][] array, int WhiteAtBottom){
@@ -159,28 +181,52 @@ public class Checkers {
         array[7][0] = 1; array[7][3] = 1; array[7][5] = 1; array[7][7] = 1;
     }
 
-    EventHandler<MouseEvent> pawnPositioning = new EventHandler<MouseEvent>(){
+    EventHandler<MouseEvent> pawnGetPosition = new EventHandler<MouseEvent>(){
 
         @Override
         public void handle(MouseEvent mouseEvent) {
             pawnOrgX = mouseEvent.getSceneX();
             pawnOrgY = mouseEvent.getSceneY();
-            translateX = ((Circle)(mouseEvent.getSource())).getTranslateX();
-            translateY = ((Circle)(mouseEvent.getSource())).getTranslateY();
+            translateX = ((ImageView)(mouseEvent.getSource())).getTranslateX();
+            translateY = ((ImageView)(mouseEvent.getSource())).getTranslateY();
+            //System.out.println(translateX + " " + translateY);
         }
     };
 
     EventHandler<MouseEvent> pawnMovement = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent mouseEvent) {
-            double yDiff = mouseEvent.getSceneY() - pawnOrgY;
-            double xDiff = mouseEvent.getSceneX() - pawnOrgX;
-            double xToBe = xDiff + translateX-frameWidth;
-            double yToBe = yDiff + translateY-frameWidth;
-            ((Circle)(mouseEvent.getSource())).setTranslateX(xToBe);
-            ((Circle)(mouseEvent.getSource())).setTranslateY(yToBe);
+            double yDiff = mouseEvent.getSceneY()-pawnOrgY;
+            double xDiff = mouseEvent.getSceneX()-pawnOrgX;
+            double xToBe = xDiff + translateX;
+            double yToBe = yDiff + translateY;
+            ((ImageView)(mouseEvent.getSource())).setTranslateX(xToBe);
+            ((ImageView)(mouseEvent.getSource())).setTranslateY(yToBe);
         }
     };
+
+    EventHandler<MouseEvent> pawnSetPosition = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent mouseEvent) {
+            //double x = mouseEvent.getSceneX();
+            //double y = mouseEvent.getSceneY();
+            //System.out.println(x + " " + y);
+            //System.out.println(ix + " " + iy);
+            double centerX = ((Pawn)(mouseEvent.getSource())).getX() + ((Pawn)(mouseEvent.getSource())).getImage().getWidth()/2
+                    + ((Pawn)(mouseEvent.getSource())).getTranslateX();
+            double centerY = ((Pawn)(mouseEvent.getSource())).getY() + ((Pawn)(mouseEvent.getSource())).getImage().getHeight()/2
+                    + ((Pawn)(mouseEvent.getSource())).getTranslateY();
+            int ix = (int)(centerX/squareSize);
+            int iy = (int)(centerY/squareSize);
+            //System.out.println( centerX - fields[ix][iy].getX());
+            ((Pawn)(mouseEvent.getSource())).setTranslateX(fields[ix][iy].getWidth()/2 + fields[ix][iy].getX() - ((Pawn)(mouseEvent.getSource())).getX()
+                    - ((Pawn)(mouseEvent.getSource())).getImage().getWidth()/2);
+            ((Pawn)(mouseEvent.getSource())).setTranslateY(fields[ix][iy].getHeight()/2 + fields[ix][iy].getY() - ((Pawn)(mouseEvent.getSource())).getY()
+                    - ((Pawn)(mouseEvent.getSource())).getImage().getHeight()/2);
+        }
+    };
+
+
 
    /* EventHandler<MouseEvent> idkIsAllowed = new EventHandler<MouseEvent>(){
 

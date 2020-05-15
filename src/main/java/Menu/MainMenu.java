@@ -77,6 +77,7 @@ public class MainMenu {
 
             this.setOnMousePressed(mouseEvent -> {
                 if(mouseEvent.getTarget().getClass().getName()!="Menu.MainMenu$MyPane") {
+                    //System.out.println("Pressed: " + windowX +" "+ stage.getX() + " " + mouseEvent.getScreenX());
                     windowX = stage.getX() - mouseEvent.getScreenX();
                     windowY = stage.getY() - mouseEvent.getScreenY();
                 }
@@ -84,7 +85,9 @@ public class MainMenu {
 
             this.setOnMouseDragged(mouseEvent -> {
                 if(mouseEvent.getTarget().getClass().getName()!="Menu.MainMenu$MyPane") {
+                    //System.out.println("Dragged1: "+ windowX +" "+ stage.getX() + " " + mouseEvent.getScreenX());
                     stage.setX(mouseEvent.getScreenX() + windowX);
+                    //System.out.println("Dragged2: " + windowX +" "+ stage.getX() + " " + mouseEvent.getScreenX());
                     stage.setY(mouseEvent.getScreenY() + windowY);
                 }
             });
