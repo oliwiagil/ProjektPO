@@ -129,7 +129,7 @@ public class Checkers {
                             if(turn){
                                 if(!check.get()) {
                                     if(checkAndSetHit(true)){
-
+                                        check.set(true);
                                     }
                                     else if (checkAndSetMove(true)) {
                                         check.set(true);
@@ -139,7 +139,7 @@ public class Checkers {
                             else{
                                 if(!check.get()) {
                                     if(checkAndSetHit(false)){
-
+                                        check.set(true);
                                     }
                                     else if (checkAndSetMove(false)) {
                                         check.set(true);
@@ -229,41 +229,35 @@ public class Checkers {
     }
 
     private boolean checkAndSetHit(boolean isWhite){
+        boolean var = false;
 
         if(isWhite){
             for(Pawn p: whitePawns){
-
+                ArrayList<Point> arrL = new ArrayList<>();
+                if(hitTopRight(p, p.getArrX(), p.getArrY(), arrL) || hitTopLeft(p, p.getArrX(), p.getArrY(), arrL) ||
+                        hitBotRight(p, p.getArrX(), p.getArrY(), arrL) ||hitBotLeft(p, p.getArrX(), p.getArrY(), arrL)){
+                    var = true;
+                    p.setEffect(glow);
+                    effectOnPawn.add(p);
+                    p.setCanHit(true);
+                }
             }
         }
         else{
             for(Pawn p: blackPawns){
-
+                ArrayList<Point> arrL = new ArrayList<>();
+                if(hitTopRight(p, p.getArrX(), p.getArrY(), arrL) || hitTopLeft(p, p.getArrX(), p.getArrY(), arrL) ||
+                        hitBotRight(p, p.getArrX(), p.getArrY(), arrL) ||hitBotLeft(p, p.getArrX(), p.getArrY(), arrL)){
+                    var = true;
+                    p.setEffect(glow);
+                    effectOnPawn.add(p);
+                    p.setCanHit(true);
+                }
             }
 
         }
 
-        return false;
-    }
-
-    private void rek(Pawn p, int x, int y){
-        ArrayList<Point> arrL = new ArrayList<>();
-        Point point = new Point(x,y);
-        arrL.add(point);
-
-        if(hitTopRight(p, x, y, arrL)){
-
-        }
-        if(hitTopLeft(p, x, y, arrL)){
-
-        }
-        if(hitBotRight(p, x, y, arrL)){
-
-        }
-        if(hitBotLeft(p, x, y, arrL)){
-
-        }
-
-        arrL.remove(point);
+        return var;
     }
 
     private class Point{
@@ -436,6 +430,24 @@ public class Checkers {
                 effectFields(((Pawn) (mouseEvent.getSource())));
                 //System.out.println(translateX + " " + translateY);
             }
+            else if(((Pawn)(mouseEvent.getSource())).isCanHit()) {
+
+                array[((Pawn) (mouseEvent.getSource())).getArrX()][((Pawn) (mouseEvent.getSource())).getArrY()] = 0;
+                //System.out.println(((Pawn) (mouseEvent.getSource())).getArrX() + " "+
+                //                ((Pawn) (mouseEvent.getSource())).getArrY() );
+                pawnOrgX = mouseEvent.getSceneX();
+                pawnOrgY = mouseEvent.getSceneY();
+                translateX = ((ImageView) (mouseEvent.getSource())).getTranslateX();
+                translateY = ((ImageView) (mouseEvent.getSource())).getTranslateY();
+
+                for(Field f: effectOnField){
+                    f.setCanBePositioned(false);
+                    f.setEffect(null);
+                }
+
+                effectFields(((Pawn) (mouseEvent.getSource())));
+                //System.out.println(translateX + " " + translateY);
+            }
         }
     };
 
@@ -519,6 +531,31 @@ public class Checkers {
             else{
                 setEffect(x-1, y+1);
             }
+        }
+    }
+
+    private void effectFieldsDuringHit(Pawn p){
+        int x = p.getArrX();
+        int y = p.getArrY();
+        //System.out.println(x + " " + y);
+        if(p.getColor() == 1) {
+            ArrayList<Point> arrL = new ArrayList<>();
+
+            if(hitTopRight(p, x, y, arrL)){
+
+            }
+            if(hitTopLeft(p, x, y, arrL)){
+
+            }
+            if(hitBotRight(p, x, y, arrL)){
+
+            }
+            if(hitBotLeft(p, x, y, arrL)){
+
+            }
+        }
+        else{
+
         }
     }
 

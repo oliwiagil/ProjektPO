@@ -10,6 +10,7 @@ public class Pawn extends ImageView {
     private int color; //1 - white, 2 - black
     private boolean canBeMoved;
     private boolean hetman;
+    private boolean canHit;
 
     public Pawn(int y, int x, Image img, int arrY, int arrX, int col){
         super(img);
@@ -21,6 +22,7 @@ public class Pawn extends ImageView {
         this.color = col;
         this.canBeMoved = false;
         this.hetman = false;
+        this.canHit = false;
     }
 
     //Getters
@@ -42,6 +44,8 @@ public class Pawn extends ImageView {
 
     public boolean isHetman(){ return hetman; }
 
+    public boolean isCanHit(){ return canHit; }
+
     //Setters
     public void setArrX(int x){
         this.arrX = x;
@@ -59,4 +63,5 @@ public class Pawn extends ImageView {
 
     public void setHetman(boolean h){ this.hetman = h; }
 
+    public void setCanHit(boolean c){ this.canHit = c; }
 }
