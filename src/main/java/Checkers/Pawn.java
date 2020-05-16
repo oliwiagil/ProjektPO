@@ -7,15 +7,20 @@ public class Pawn extends ImageView {
 
     private int arrX;
     private int arrY;
-    private boolean color; //0 - white, 1 - black
+    private int color; //1 - white, 2 - black
+    private boolean canBeMoved;
+    private boolean hetman;
 
-    public Pawn(int y, int x, Image img, int arrY, int arrX, boolean col){
+    public Pawn(int y, int x, Image img, int arrY, int arrX, int col){
         super(img);
         this.setY(y-(img.getHeight()/2));
         this.setX(x-(img.getWidth()/2));
         this.arrX = arrX;
         this.arrY = arrY;
+        if(col != 1 && col != 2) System.out.println("Color nie dizala");
         this.color = col;
+        this.canBeMoved = false;
+        this.hetman = false;
     }
 
     //Getters
@@ -27,9 +32,15 @@ public class Pawn extends ImageView {
         return arrY;
     }
 
-    public boolean getColor(){
+    public int getColor(){
         return color;
     }
+
+    public boolean isCanBeMoved(){
+        return canBeMoved;
+    }
+
+    public boolean isHetman(){ return hetman; }
 
     //Setters
     public void setArrX(int x){
@@ -40,8 +51,12 @@ public class Pawn extends ImageView {
         this.arrY = y;
     }
 
-    public void setColor(boolean col){
+    public void setColor(int col){
         this.color = col;
     }
+
+    public void setCanBeMoved(boolean c){ this.canBeMoved = c; }
+
+    public void setHetman(boolean h){ this.hetman = h; }
 
 }

@@ -5,12 +5,21 @@ import javafx.scene.shape.Rectangle;
 
 public class Field extends Rectangle {
 
-    Field(double x, double y, double sizeWidth, double sizeHeight){
-        super(x, y, sizeWidth, sizeHeight);
-    }
+    private boolean canBePositioned;
 
-    Field(double x, double y, double sizeWidth, double sizeHeight, Paint fill){
+    public Field(double x, double y, double sizeWidth, double sizeHeight, Paint fill){
         super(x, y, sizeWidth, sizeHeight);
         this.setFill(fill);
+        this.canBePositioned = false;
+    }
+
+    //Setters
+    public void setCanBePositioned(boolean c){
+        this.canBePositioned = c;
+    }
+
+    //Getters
+    public boolean isCanBePositioned(){
+        return this.canBePositioned;
     }
 }
