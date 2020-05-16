@@ -427,6 +427,12 @@ public class Checkers {
                 pawnOrgY = mouseEvent.getSceneY();
                 translateX = ((ImageView) (mouseEvent.getSource())).getTranslateX();
                 translateY = ((ImageView) (mouseEvent.getSource())).getTranslateY();
+
+                for(Field f: effectOnField){
+                    f.setCanBePositioned(false);
+                    f.setEffect(null);
+                }
+
                 effectFields(((Pawn) (mouseEvent.getSource())));
                 //System.out.println(translateX + " " + translateY);
             }
@@ -461,8 +467,8 @@ public class Checkers {
                         + ((Pawn) (mouseEvent.getSource())).getTranslateY();
                 int ix = (int) (centerX / squareSize);
                 int iy = (int) (centerY / squareSize);
+                array[ix][iy] = ((Pawn) (mouseEvent.getSource())).getColor();
                 if(fields[ix][iy].isCanBePositioned()) {
-                    array[ix][iy] = ((Pawn) (mouseEvent.getSource())).getColor();
                     ((Pawn) (mouseEvent.getSource())).setArrX(ix);
                     ((Pawn) (mouseEvent.getSource())).setArrY(iy);
 
