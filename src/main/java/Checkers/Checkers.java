@@ -269,7 +269,7 @@ public class Checkers {
     }
 
     private boolean hitTopRight(Pawn p, int x, int y, ArrayList<Point> arr){
-        if(y>=2 && x<=5){
+        if(y>0 && x<=6){
             if(array[x+1][y-1] != 0 && array[x][y] != array[x+1][y-1]){
                 if(array[x+2][y-2] == 0){
                     for(Point point: arr){
@@ -283,7 +283,7 @@ public class Checkers {
     }
 
     private boolean hitTopLeft(Pawn p, int x, int y, ArrayList<Point> arr){
-        if(y>=2 && x>=2){
+        if(y>0 && x>0){
             if(array[x-1][y-1] != 0 && array[x][y] != array[x-1][y-1]){
                 if(array[x-2][y-2] == 0){
                     for(Point point: arr){
@@ -297,8 +297,8 @@ public class Checkers {
     }
 
     private boolean hitBotRight(Pawn p, int x, int y, ArrayList<Point> arr){
-        if(y>=5 && x<=5){
-            if(array[x+1][y+1] != 0 && array[x][y] != array[x+1][y+1]){
+        if(y<=6 && x<=6){
+            if(x+1 < boardSize && y+1 < boardSize && array[x+1][y+1] != 0 && array[x][y] != array[x+1][y+1]){
                 if(array[x+2][y+2] == 0){
                     for(Point point: arr){
                         if(x+2 == point.x && y+2 == point.y) return false;
@@ -311,8 +311,8 @@ public class Checkers {
     }
 
     private boolean hitBotLeft(Pawn p, int x, int y, ArrayList<Point> arr){
-        if(y>=5 && x>=2){
-            if(array[x-1][y+1] != 0 && array[x][y] != array[x-1][y+1]){
+        if(y<7 && x>0){
+            if(x-1 >= 0 && y+1 < boardSize &&  array[x-1][y+1] != 0 && array[x][y] != array[x-1][y+1]){
                 if(array[x-2][y+2] == 0){
                     for(Point point: arr){
                         if(x-2 == point.x && y+2 == point.y) return false;
