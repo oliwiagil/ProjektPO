@@ -244,8 +244,11 @@ public class MainMenu {
             });
 
             imageViewSnake.setOnMouseClicked(MouseEvent->{
-                snake = new Snake(thisMainMenu);
-                snake.startGame();
+                if(snakeMenu == null){
+                    snakeMenu = new SnakeMenu(thisMainMenu);
+                }
+                snakeMenu.open();
+                thisMainMenu.close();
             });
 
             imageViewSnake.setX(326);
