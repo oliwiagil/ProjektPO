@@ -432,8 +432,8 @@ public class Checkers {
             else if(((Pawn)(mouseEvent.getSource())).isCanHit()) {
 
                 array[((Pawn) (mouseEvent.getSource())).getArrX()][((Pawn) (mouseEvent.getSource())).getArrY()] = 0;
-                //System.out.println(((Pawn) (mouseEvent.getSource())).getArrX() + " "+
-                //                ((Pawn) (mouseEvent.getSource())).getArrY() );
+                System.out.println(((Pawn) (mouseEvent.getSource())).getArrX() + " "+
+                                ((Pawn) (mouseEvent.getSource())).getArrY() );
                 pawnOrgX = mouseEvent.getSceneX();
                 pawnOrgY = mouseEvent.getSceneY();
                 translateX = ((ImageView) (mouseEvent.getSource())).getTranslateX();
@@ -444,7 +444,7 @@ public class Checkers {
                     f.setEffect(null);
                 }
 
-                effectFields(((Pawn) (mouseEvent.getSource())));
+                effectFieldsDuringHit(((Pawn) (mouseEvent.getSource())));
                 //System.out.println(translateX + " " + translateY);
             }
         }
@@ -460,6 +460,13 @@ public class Checkers {
                 double yToBe = yDiff + translateY;
                 ((ImageView) (mouseEvent.getSource())).setTranslateX(xToBe);
                 ((ImageView) (mouseEvent.getSource())).setTranslateY(yToBe);
+            } else if (((Pawn)(mouseEvent.getSource())).isCanHit()){
+                double yDiff = mouseEvent.getSceneY() - pawnOrgY;
+                double xDiff = mouseEvent.getSceneX() - pawnOrgX;
+                double xToBe = xDiff + translateX;
+                double yToBe = yDiff + translateY;
+                ((ImageView) (mouseEvent.getSource())).setTranslateX(xToBe);
+                ((ImageView) (mouseEvent.getSource())).setTranslateY(yToBe);
             }
         }
     };
@@ -468,6 +475,35 @@ public class Checkers {
         @Override
         public void handle(MouseEvent mouseEvent) {
             if(((Pawn)(mouseEvent.getSource())).isCanBeMoved()) {
+                //double x = mouseEvent.getSceneX();
+                //double y = mouseEvent.getSceneY();
+                //System.out.println(x + " " + y);
+                //System.out.println(ix + " " + iy);
+                double centerX = ((Pawn) (mouseEvent.getSource())).getX() + ((Pawn) (mouseEvent.getSource())).getImage().getWidth() / 2
+                        + ((Pawn) (mouseEvent.getSource())).getTranslateX();
+                double centerY = ((Pawn) (mouseEvent.getSource())).getY() + ((Pawn) (mouseEvent.getSource())).getImage().getHeight() / 2
+                        + ((Pawn) (mouseEvent.getSource())).getTranslateY();
+                int ix = (int) (centerX / squareSize);
+                int iy = (int) (centerY / squareSize);
+                array[ix][iy] = ((Pawn) (mouseEvent.getSource())).getColor();
+                if(fields[ix][iy].isCanBePositioned()) {
+                    ((Pawn) (mouseEvent.getSource())).setArrX(ix);
+                    ((Pawn) (mouseEvent.getSource())).setArrY(iy);
+
+                    //System.out.println( centerX - fields[ix][iy].getX());
+                    ((Pawn) (mouseEvent.getSource())).setTranslateX(fields[ix][iy].getWidth() / 2 + fields[ix][iy].getX() - ((Pawn) (mouseEvent.getSource())).getX()
+                            - ((Pawn) (mouseEvent.getSource())).getImage().getWidth() / 2);
+                    ((Pawn) (mouseEvent.getSource())).setTranslateY(fields[ix][iy].getHeight() / 2 + fields[ix][iy].getY() - ((Pawn) (mouseEvent.getSource())).getY()
+                            - ((Pawn) (mouseEvent.getSource())).getImage().getHeight() / 2);
+
+                    endOfPlayerTurn();
+
+                }
+                else{
+                    ((Pawn) (mouseEvent.getSource())).setTranslateX(translateX);
+                    ((Pawn) (mouseEvent.getSource())).setTranslateY(translateY);
+                }
+            } else if (((Pawn)(mouseEvent.getSource())).isCanHit()) {
                 //double x = mouseEvent.getSceneX();
                 //double y = mouseEvent.getSceneY();
                 //System.out.println(x + " " + y);
@@ -541,20 +577,34 @@ public class Checkers {
             ArrayList<Point> arrL = new ArrayList<>();
 
             if(hitTopRight(p, x, y, arrL)){
-
+                setEffect(x+2,y-2);
             }
             if(hitTopLeft(p, x, y, arrL)){
-
+                setEffect(x-2, y-2);
             }
             if(hitBotRight(p, x, y, arrL)){
-
+                setEffect(x+2, y+2);
             }
             if(hitBotLeft(p, x, y, arrL)){
-
+                setEffect(x-2, y+2);
             }
         }
         else{
+            ArrayList<Point> arrL = new ArrayList<>();
 
+            if(hitTopRight(p, x, y, arrL)){
+
+                setEffect(x+2,y-2);
+            }
+            if(hitTopLeft(p, x, y, arrL)){
+                setEffect(x-2, y-2);
+            }
+            if(hitBotRight(p, x, y, arrL)){
+                setEffect(x+2, y+2);
+            }
+            if(hitBotLeft(p, x, y, arrL)){
+                setEffect(x-2, y+2);
+            }
         }
     }
 
