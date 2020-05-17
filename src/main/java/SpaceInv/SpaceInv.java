@@ -54,7 +54,7 @@ public class SpaceInv {
     private boolean canShot;
     private int time;
     private int level;
-    private boolean pause;
+    public boolean pause;
     private boolean win;
     private int cykl;
 
@@ -80,6 +80,7 @@ public class SpaceInv {
 
     private GameOverWindow gameOverWindow = null;
     private GameWinWindow gameWinWindow = null;
+    private GamePauseWindow gamePauseWindow = null;
 
     //audio
     //https://archive.org/details/RIFLEGUNTIKKAT3TACTICALSHOT01
@@ -880,8 +881,13 @@ public class SpaceInv {
         if(!pause){
             pause=true;
             timeline.stop();
+            if(gamePauseWindow == null){
+                gamePauseWindow = new GamePauseWindow(returnMenu);
+            }
+            gamePauseWindow.open();
         }
         else{
+            if(gamePauseWindow != null)  gamePauseWindow.close();
             pause=false;
             timeline.play();
         }

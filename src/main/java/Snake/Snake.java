@@ -46,19 +46,20 @@ public class Snake {
     public int lastX;
     public int lastY;
     public char DIRECTION='0';
-
+    private SnakeMenu snakeMenu;
     Scene scene;
     public Stage gameStage;
 
-    ImagePattern foodP = new ImagePattern(new Image("file:media/food.PNG"));
-    ImagePattern snakeP = new ImagePattern(new Image("file:media/tail.PNG"));
-  //  ImagePattern headP = new ImagePattern(new Image("file:media/head.PNG"));
-    ImagePattern headW = new ImagePattern(new Image("file:media/headW.PNG"));
-    ImagePattern headS = new ImagePattern(new Image("file:media/headS.PNG"));
-    ImagePattern headA = new ImagePattern(new Image("file:media/headA.PNG"));
-    ImagePattern headD = new ImagePattern(new Image("file:media/headD.PNG"));
+    ImagePattern foodP = new ImagePattern(new Image("file:media/Snake/food.PNG"));
+    ImagePattern snakeP = new ImagePattern(new Image("file:media/Snake/tail.PNG"));
+  //  ImagePattern headP = new ImagePattern(new Image("file:media/Snake/head.PNG"));
+    ImagePattern headW = new ImagePattern(new Image("file:media/Snake/headW.PNG"));
+    ImagePattern headS = new ImagePattern(new Image("file:media/Snake/headS.PNG"));
+    ImagePattern headA = new ImagePattern(new Image("file:media/Snake/headA.PNG"));
+    ImagePattern headD = new ImagePattern(new Image("file:media/Snake/headD.PNG"));
 
-    public Snake(MainMenu menu){
+    public Snake(SnakeMenu menu){
+        snakeMenu = menu;
         gameStage = new Stage();
         TLO=Color.YELLOWGREEN;
         WIDTH=2*WYMIAR*WID;
