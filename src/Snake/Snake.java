@@ -34,7 +34,8 @@ public class Snake {
     public boolean wejscie;
 
     Food food;
-    //  public int czas=0;
+    SuperFood superFood;
+    public int czas;
     public GridPane gamePane;
     public SnakePlayer waz;
     public Timeline timeline;
@@ -84,6 +85,8 @@ public class Snake {
         //zeby w EH uruchomic timeline
         dziala=false;
         over=false;
+        superFood=null;
+        czas=1;
         uplywczasu();
     }
 
@@ -133,7 +136,8 @@ public class Snake {
                 gameGrid.addRow(y,new Rectangle(2*WYMIAR,2*WYMIAR,TLO));
             }
         }
-        //   gameGrid.setGridLinesVisible(true);
+
+           gameGrid.setGridLinesVisible(true);
     }
 
     void uplywczasu(){
@@ -141,12 +145,42 @@ public class Snake {
                 new KeyFrame(
                         Duration.millis(SPEED),
                         event -> {
-                            //czas++
+                            czas++;
                             //w czasie jednego eventu kazdy element weza (getLayoutX, Y) ma caly czas ta samo pozycje mimo zmian
                             ruch();
                             //tylko jedna zmiana kierunku na ruch
                             //jeszeli pozwolic na wiecej to moze dojsc do oszustwa
                             //np. bylo s, wciskamy d, nastepnie szybko w i idziemy w nidozwolonym kierunku
+
+                            //raz na 35 ruchow pojawia sie superfood
+                            System.out.println(czas+"  "+superFood);
+                            if(czas%35==0&&superFood==null){
+                                superFood=new SuperFood();
+                                czas=1;
+                            }
+                            //po 30 ruchach znika
+                            if(czas%30==0&&superFood!=null){
+                                superFood.delete();
+                                superFood=null;
+                                czas=1;
+                            }
+/*
+                            //   wczesniej byly z tym problemy
+                            if(superFood==null) {
+                                if (czas %35 == 0) {
+                                    superFood = new SuperFood();
+                                    czas=1;
+                                }
+                            }
+                            else {
+                                if (czas % 30 == 0) {
+                                    superFood.foodSq.setVisible(false);
+                                    superFood = null;
+                                    czas=1;
+                                }
+                            }
+*/
+
                             wejscie=true;
                         }
                 )
@@ -174,6 +208,13 @@ public class Snake {
             }
 
             food.locateFood();
+            if(superFood!=null){
+                //zostalo zjedzone
+                if(superFood.locateSuperFood()){
+                    superFood=null;
+                    czas=1;
+                }
+            }
         }
     }
 
@@ -216,6 +257,40 @@ public class Snake {
                 GridPane.setConstraints(foodSq, x, y);
             }
         }
+    }
+
+    public class SuperFood{
+        int x;
+        int y;
+        Rectangle foodSq;
+
+        SuperFood(){
+            do{
+                x=random.nextInt(WID);
+                y = random.nextInt(HEI);
+            } while(waz.checkZderzenie(x,y)||(x==waz.x&&y==waz.y)||(x==food.x&&y==food.y));
+
+            foodSq=new Rectangle(2*WYMIAR,2*WYMIAR,Color.YELLOW);
+            GridPane.setConstraints(foodSq, x, y);
+            gamePane.getChildren().add(foodSq);
+            superFood =this;
+        }
+        boolean locateSuperFood(){
+            if(x==waz.x&&y==waz.y){
+                //dodanie nowego ogona, przyrost o 6
+                for(int i=0;i<6;i++) {
+                    waz.size++;
+                    tab[waz.size] = new Rectangle(2 * WYMIAR, 2 * WYMIAR);
+                    tab[waz.size].setFill(snakeP);
+                    GridPane.setConstraints(tab[waz.size], lastX, lastY);
+                    gamePane.getChildren().add(tab[waz.size]);
+                }
+            delete();
+            return true;
+            }
+            return false;
+        }
+        void delete(){foodSq.setVisible(false);}
     }
 
     public class SnakePlayer {
@@ -316,6 +391,11 @@ public class Snake {
 
     public void gameOver(){
         gamePause();
+        if(superFood!=null) {
+            superFood.delete();
+            superFood = null;
+        }
         over=true;
+        czas=1;
     }
 }
