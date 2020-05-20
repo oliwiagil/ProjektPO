@@ -18,6 +18,7 @@ public class Field extends Rectangle {
         this.canBePositioned = c;
     }
 
+
     //Getters
     public boolean isCanBePositioned(){
         return this.canBePositioned;

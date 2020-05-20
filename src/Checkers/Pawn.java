@@ -18,7 +18,7 @@ public class Pawn extends ImageView {
         this.setX(x-(img.getWidth()/2));
         this.arrX = arrX;
         this.arrY = arrY;
-        if(col != 1 && col != 2) System.out.println("Color nie dizala");
+        if(col != 1 && col != 2) System.out.println("Color nie dziala");
         this.color = col;
         this.canBeMoved = false;
         this.hetman = false;
@@ -64,4 +64,10 @@ public class Pawn extends ImageView {
     public void setHetman(boolean h){ this.hetman = h; }
 
     public void setCanHit(boolean c){ this.canHit = c; }
+
+    public void hide(){
+        this.setArrX(0);
+        this.setArrY(0);
+        this.setImage(null);
+    }
 }

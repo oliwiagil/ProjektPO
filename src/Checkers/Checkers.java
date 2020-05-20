@@ -4,16 +4,23 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -55,6 +62,8 @@ public class Checkers {
     private Field[][] fields;
     private ArrayList<Pawn> blackPawns;
     private ArrayList<Pawn> whitePawns;
+    Label winner = null;
+    Label whosMove = null;
 
     private ArrayList<Pawn> effectOnPawn;
     private ArrayList<Field> effectOnField;
@@ -80,9 +89,44 @@ public class Checkers {
         effectOnPawn = new ArrayList<>();
         turn = true;
         gamePane = performBoard();
-        scene = new Scene(gamePane);
+
+        BorderPane borderPane = new BorderPane();
+
+        winner = new Label();
+        winner.setFont(Font.font("Calibri", 15));
+
+        whosMove = new Label();
+        whosMove.setFont(Font.font("Calibri", 15));
+
+        Button btnBack = new Button("Back");
+        btnBack.setPadding(new Insets(10));
+        btnBack.setOnAction((event)->{
+            returnMenu.open();
+            gameStage.hide();
+            returnMenu.game = null;
+        });
+
+        borderPane.setTop(whosMove);
+        borderPane.setBottom(btnBack);
+        borderPane.setCenter(winner);
+        borderPane.setPrefWidth(150);
+        borderPane.setMaxWidth(150);
+        borderPane.setMinWidth(150);
+
+        HBox hBox = new HBox();
+        hBox.getChildren().addAll(gamePane, borderPane);
+        hBox.setSpacing(10);
+
+        scene = new Scene(hBox);
         gameStage.setTitle("Checkers");
         gameStage.setScene(scene);
+    }
+
+    private void setWhoseMove(){
+        if(turn){
+            whosMove.setText("Move has: White");
+        }
+        else whosMove.setText("Move has: Black");
     }
 
     //odpalamy grę, pokazujemy stage i włączamy czas
@@ -134,6 +178,9 @@ public class Checkers {
                                     else if (checkAndSetMove(true)) {
                                         check.set(true);
                                     }
+                                    else{
+                                        blackWin();
+                                    }
                                 }
                             }
                             else{
@@ -144,13 +191,25 @@ public class Checkers {
                                     else if (checkAndSetMove(false)) {
                                         check.set(true);
                                     }
+                                    else{
+                                        whiteWin();
+                                    }
                                 }
 
                             }
 
                 }));
         timeline.setCycleCount(Animation.INDEFINITE);
+        setWhoseMove();
         timeline.play();
+    }
+
+    private void blackWin(){
+        winner.setText("Black has won!");
+    }
+
+    private  void whiteWin(){
+        winner.setText("White has won!");
     }
 
     private boolean checkAndSetMove(boolean isWhite){
@@ -432,8 +491,8 @@ public class Checkers {
             else if(((Pawn)(mouseEvent.getSource())).isCanHit()) {
 
                 array[((Pawn) (mouseEvent.getSource())).getArrX()][((Pawn) (mouseEvent.getSource())).getArrY()] = 0;
-                System.out.println(((Pawn) (mouseEvent.getSource())).getArrX() + " "+
-                                ((Pawn) (mouseEvent.getSource())).getArrY() );
+                //System.out.println(((Pawn) (mouseEvent.getSource())).getArrX() + " "+
+                //                ((Pawn) (mouseEvent.getSource())).getArrY() );
                 pawnOrgX = mouseEvent.getSceneX();
                 pawnOrgY = mouseEvent.getSceneY();
                 translateX = ((ImageView) (mouseEvent.getSource())).getTranslateX();
@@ -485,8 +544,8 @@ public class Checkers {
                         + ((Pawn) (mouseEvent.getSource())).getTranslateY();
                 int ix = (int) (centerX / squareSize);
                 int iy = (int) (centerY / squareSize);
-                array[ix][iy] = ((Pawn) (mouseEvent.getSource())).getColor();
                 if(fields[ix][iy].isCanBePositioned()) {
+                    array[ix][iy] = ((Pawn) (mouseEvent.getSource())).getColor();
                     ((Pawn) (mouseEvent.getSource())).setArrX(ix);
                     ((Pawn) (mouseEvent.getSource())).setArrY(iy);
 
@@ -500,6 +559,7 @@ public class Checkers {
 
                 }
                 else{
+                    array[((Pawn) (mouseEvent.getSource())).getArrX()][((Pawn) (mouseEvent.getSource())).getArrY()] = ((Pawn) (mouseEvent.getSource())).getColor();
                     ((Pawn) (mouseEvent.getSource())).setTranslateX(translateX);
                     ((Pawn) (mouseEvent.getSource())).setTranslateY(translateY);
                 }
@@ -514,8 +574,14 @@ public class Checkers {
                         + ((Pawn) (mouseEvent.getSource())).getTranslateY();
                 int ix = (int) (centerX / squareSize);
                 int iy = (int) (centerY / squareSize);
-                array[ix][iy] = ((Pawn) (mouseEvent.getSource())).getColor();
                 if(fields[ix][iy].isCanBePositioned()) {
+                    array[ix][iy] = ((Pawn) (mouseEvent.getSource())).getColor();
+                    int begX = ((Pawn) (mouseEvent.getSource())).getArrX();
+                    int begY = ((Pawn) (mouseEvent.getSource())).getArrY();
+                    int midx = (begX + ix)/2;
+                    int midy = (begY + iy)/2;
+                    eraseEnemy(midx, midy);
+
                     ((Pawn) (mouseEvent.getSource())).setArrX(ix);
                     ((Pawn) (mouseEvent.getSource())).setArrY(iy);
 
@@ -525,10 +591,13 @@ public class Checkers {
                     ((Pawn) (mouseEvent.getSource())).setTranslateY(fields[ix][iy].getHeight() / 2 + fields[ix][iy].getY() - ((Pawn) (mouseEvent.getSource())).getY()
                             - ((Pawn) (mouseEvent.getSource())).getImage().getHeight() / 2);
 
-                    endOfPlayerTurn();
-
+                    if(!checkHit((Pawn) (mouseEvent.getSource()))){
+                        endOfPlayerTurn();
+                    }
                 }
                 else{
+                    //array[ix][iy] = 0;
+                    //array[((Pawn) (mouseEvent.getSource())).getArrX()][((Pawn) (mouseEvent.getSource())).getArrY()] = ((Pawn) (mouseEvent.getSource())).getColor();
                     ((Pawn) (mouseEvent.getSource())).setTranslateX(translateX);
                     ((Pawn) (mouseEvent.getSource())).setTranslateY(translateY);
                 }
@@ -619,6 +688,7 @@ public class Checkers {
     private void endOfPlayerTurn(){
         for(Pawn p: effectOnPawn){
             p.setCanBeMoved(false);
+            p.setCanHit(false);
             p.setEffect(null);
         }
 
@@ -626,8 +696,39 @@ public class Checkers {
             f.setCanBePositioned(false);
             f.setEffect(null);
         }
+        effectOnField.clear();
+        effectOnPawn.clear();
         turn = !turn;
+        setWhoseMove();
         check.set(false);
+    }
+
+    private void eraseEnemy(int x, int y){
+        array[x][y] = 0;
+        for(Pawn p: blackPawns){
+            if(p.getArrX() ==x && p.getArrY() == y){
+                p.hide();
+                p.setEffect(null);
+            }
+        }
+        for(Pawn p: whitePawns){
+            if(p.getArrX() ==x && p.getArrY() == y){
+                p.hide();
+                p.setEffect(null);
+            }
+        }
+    }
+
+    private boolean checkHit(Pawn p){
+        ArrayList<Point> arrL = new ArrayList<>();
+        if(hitTopRight(p, p.getArrX(), p.getArrY(), arrL) || hitTopLeft(p, p.getArrX(), p.getArrY(), arrL) ||
+                hitBotRight(p, p.getArrX(), p.getArrY(), arrL) ||hitBotLeft(p, p.getArrX(), p.getArrY(), arrL)){
+            p.setEffect(glow);
+            effectOnPawn.add(p);
+            p.setCanHit(true);
+            return true;
+        }
+        return false;
     }
 
     private void makeHetman(Pawn p){
