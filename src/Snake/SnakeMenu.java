@@ -19,6 +19,7 @@ public class SnakeMenu {
     SnakeMenu snakeMenu = null;
     MainMenu mainMenu = null;
     Snake game = null;
+    sSettings settings = null;
 
 
     Pane pane = null;
@@ -31,6 +32,7 @@ public class SnakeMenu {
         mainMenu = mm;
         snakeMenu = this;
         stage = new Stage();
+        settings = new sSettings(snakeMenu);
 
         createMenu();
     }
@@ -87,6 +89,8 @@ public class SnakeMenu {
             //Settings Button //---------------------------------------------
             Button btnSett = new Button("Settings");
             btnSett.setOnAction(ActionEvent->{
+                settings.open();
+                snakeMenu.close();
             });
             btnSett.setPrefWidth(btnWidth);
             btnSett.setMinWidth(btnWidth);
@@ -108,7 +112,7 @@ public class SnakeMenu {
             this.setSpacing(7);
             this.setPadding(new Insets(20));
             this.setAlignment(Pos.CENTER);
-            this.getChildren().addAll(lbl, btnStart, btnBack);
+            this.getChildren().addAll(lbl, btnStart, btnSett,btnBack);
 
         }
 

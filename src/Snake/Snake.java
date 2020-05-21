@@ -15,7 +15,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.nio.file.Paths;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Snake {
     //szerokosc i wysokosc liczona w liczbie kwadratow
@@ -63,8 +65,35 @@ public class Snake {
     ImagePattern headD = new ImagePattern(new Image("file:media/Snake/headD.PNG"));
 
     public Snake(SnakeMenu menu){
-        snakeMenu = menu;
         gameStage = new Stage();
+        snakeMenu = menu;
+
+        //Read settings from file.cfg and set all variables
+        try(Scanner in = new Scanner(Paths.get("settings/Snake.cfg"))){
+            while(in.hasNext()){
+                String line = in.nextLine();
+                int pos = line.indexOf('=');
+                String temp1 = line.substring(0, pos);
+                String temp2 = line.substring(pos + 1);
+                if ("difficulty".equals(temp1)) {
+                    switch (temp2) {
+                        case "EASY":
+                            SPEED = 250;
+                            break;
+                        case "NORMAL":
+                            SPEED = 150;
+                            break;
+                        case "HARD":
+                            SPEED = 80;
+                            break;
+                    }
+                }
+            }
+        } catch(Exception e){
+            System.out.println(e);
+            SPEED=200;
+        }
+
         TLO=Color.YELLOWGREEN;
         WIDTH=2*WYMIAR*WID;
         HEIGHT=2*WYMIAR*HEI;
