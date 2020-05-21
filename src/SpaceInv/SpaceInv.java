@@ -78,6 +78,8 @@ public class SpaceInv {
     private static boolean next=false;
     private boolean gameR =true;
 
+    Ufo ufo;
+
     private GameOverWindow gameOverWindow = null;
     private GameWinWindow gameWinWindow = null;
     private GamePauseWindow gamePauseWindow = null;
@@ -101,6 +103,7 @@ public class SpaceInv {
     ImagePattern enemy3b = new ImagePattern(new Image("file:media/SpaceInv/enemy3b.PNG"));
     ImagePattern enemy3f = new ImagePattern(new Image("file:media/SpaceInv/enemy3f.PNG"));
     ImagePattern ship3b = new ImagePattern(new Image("file:media/SpaceInv/ship3b.PNG"));
+    ImagePattern ufo1 = new ImagePattern(new Image("file:media/SpaceInv/ufo1f.PNG"));
     static ImagePattern explosion = new ImagePattern(new Image("file:media/SpaceInv/explosion2.PNG"));
     static ImagePattern explosionB = new ImagePattern(new Image("file:media/SpaceInv/explosion2b.PNG"));
     static ImagePattern explosionG = new ImagePattern(new Image("file:media/SpaceInv/explosion2g.PNG"));
@@ -357,6 +360,8 @@ public class SpaceInv {
         bulletsEnemy.clear();
         enemies.clear();
 
+        ufo=null;
+
         setVariables();
         scoreAkt();
         createEnemies(0);
@@ -381,6 +386,9 @@ public class SpaceInv {
         gameStage.centerOnScreen();
         gameStage.setResizable(true);
         gameStage.show();
+
+        ufo=null;
+
         uplywczasu();
     }
 
@@ -525,7 +533,37 @@ public class SpaceInv {
         }
     }
 
+    private class Ufo extends Rectangle {
+        double currentX;
+        double currentY;
+
+        Ufo(double x, double y){
+            super(((WIDTH-2*korekta)/10.0)*0.7,(HEIGHT/10.0)*0.4);
+            this.setFill(ufo1);
+
+            currentX=x+korekta;
+            currentY=y;
+            setTranslateX(currentX);
+            setTranslateY(currentY);
+
+            gamePane.getChildren().add(this);
+        }
+
+        void moveD() {
+            currentX +=((WIDTH-2*korekta)/10.0)*0.05;
+            if(currentX+((WIDTH-2*korekta)/10.0)*0.7>=WIDTH-korekta){setVisible(false);}
+            setTranslateX(currentX);
+        }
+    }
+
     private void ruch(){
+        if(enemies.size()<=25&&ufo==null){
+            ufo=new Ufo(0,20);
+        }
+        if(ufo!=null) {
+            ufo.moveD();
+        }
+
         //wykonanie ruchu statku
         if(left){gracz.moveA();}
         else if(right){gracz.moveD();}
@@ -538,6 +576,7 @@ public class SpaceInv {
                 gameR =true;
                 win=false;
                 canShot=true;
+                ufo=null;
             }
             else if(gameR){
                 canShot = false;
@@ -555,18 +594,30 @@ public class SpaceInv {
         //przemieszcza pociski statku
         for(Bullet i : bullets){
             if(i.moveUp()) {
-                for (Enemy j : enemies) {
-                    //jezeli jakis pocisk trafil przeciwnika
-                    if (i.getBoundsInParent().intersects(j.getBoundsInParent())) {
-                    //    sound1.play();
-                        scoreI+=j.points;
-                        scoreAkt();
-                        //ukrywam pocisk i przeciwnika
-                        new Explosion(j,(long) ((j.szerokoscE/moveEnemy)*5)).start();
-                        i.setVisible(false);
-                        //dodaje do listy elementow do usuniecia
-                        removeB.add(i);
-                        removeE.add(j);
+                if(ufo!=null&&i.getBoundsInParent().intersects(ufo.getBoundsInParent())){
+                    scoreI += 20;
+                    scoreAkt();
+                    //ukrywam pocisk i przeciwnika
+                //    new Explosion(j, (long) ((j.szerokoscE / moveEnemy) * 5)).start();
+                    i.setVisible(false);
+                    ufo.setVisible(false);
+                    //dodaje do listy elementow do usuniecia
+                    removeB.add(i);
+                }
+                else {
+                    for (Enemy j : enemies) {
+                        //jezeli jakis pocisk trafil przeciwnika
+                        if (i.getBoundsInParent().intersects(j.getBoundsInParent())) {
+                            //    sound1.play();
+                            scoreI += j.points;
+                            scoreAkt();
+                            //ukrywam pocisk i przeciwnika
+                            new Explosion(j, (long) ((j.szerokoscE / moveEnemy) * 5)).start();
+                            i.setVisible(false);
+                            //dodaje do listy elementow do usuniecia
+                            removeB.add(i);
+                            removeE.add(j);
+                        }
                     }
                 }
             }
@@ -603,10 +654,14 @@ public class SpaceInv {
                         //dodaje do listy elementow do usuniecia
                         removeBE.add(i);
                         life--;
-                        lives.get(life).setVisible(false);
-                        if(life==0){gameOver();}
-                        else{
-                            new Explosion(gracz).start();
+                        //pojawial sie blad ze life=-1 (jak dwa pociski naraz trafia przy jednym zyciu)
+                        if(life>=0) {
+                            lives.get(life).setVisible(false);
+                            if (life == 0) {
+                                gameOver();
+                            } else {
+                                new Explosion(gracz).start();
+                            }
                         }
                     }
                 }
@@ -894,11 +949,19 @@ public class SpaceInv {
     }
 
     private void startGameOverWindow(){
+        if(ufo!=null) {
+            ufo.setVisible(false);
+            ufo = null;
+        }
         gameOverWindow = new GameOverWindow(returnMenu);
         gameOverWindow.open();
     }
 
     private void startGameWinWindow(){
+        if(ufo!=null) {
+            ufo.setVisible(false);
+            ufo = null;
+        }
         gameWinWindow = new GameWinWindow(returnMenu);
         gameWinWindow.open();
     }
