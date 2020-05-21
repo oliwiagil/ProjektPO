@@ -77,8 +77,10 @@ public class SpaceInv {
     public int scoreI;
     private static boolean next=false;
     private boolean gameR =true;
+    private boolean over =false;
 
-    Ufo ufo;
+
+    Ufo ufo=null;
 
     private GameOverWindow gameOverWindow = null;
     private GameWinWindow gameWinWindow = null;
@@ -204,6 +206,8 @@ public class SpaceInv {
         pause=false;
         gameR =true;
         next=false;
+        over=false;
+        ufo=null;
 
         switch(difficulty){
             case EASY: cykl=6; enemyMoveDown =((WIDTH-2*korekta)/10.0)*0.2; enemyShootFrq=2; break;
@@ -360,8 +364,6 @@ public class SpaceInv {
         bulletsEnemy.clear();
         enemies.clear();
 
-        ufo=null;
-
         setVariables();
         scoreAkt();
         createEnemies(0);
@@ -386,8 +388,6 @@ public class SpaceInv {
         gameStage.centerOnScreen();
         gameStage.setResizable(true);
         gameStage.show();
-
-        ufo=null;
 
         uplywczasu();
     }
@@ -904,9 +904,12 @@ public class SpaceInv {
     }
 
     public void gameOver(){
-   //     sound3.play();
-        timeline.stop();
-        startGameOverWindow();
+        if(!over) {
+            over=true;
+            //     sound3.play();
+            timeline.stop();
+            startGameOverWindow();
+        }
     }
 
     public void gameWin(){
