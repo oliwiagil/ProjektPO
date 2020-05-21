@@ -941,11 +941,6 @@ public class SpaceInv {
             }
             gamePauseWindow.open();
         }
-        else{
-            if(gamePauseWindow != null)  gamePauseWindow.close();
-            pause=false;
-            timeline.play();
-        }
     }
 
     private void startGameOverWindow(){
