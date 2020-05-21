@@ -85,7 +85,7 @@ public class SpaceInvMenu {
             Button btnStart = new Button("Start");
             btnStart.setPrefWidth(btnWidth);
             btnStart.setMinWidth(btnWidth);
-            btnStart.setOnMouseClicked(MouseEvent ->{
+            btnStart.setOnAction(ActionEvent ->{
                 startGame();
             });
 

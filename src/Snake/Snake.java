@@ -52,6 +52,7 @@ public class Snake {
     public Stage gameStage;
 
     private sGamePauseWindow gamePauseWindow = null;
+    private sGameOverWindow gameOverWindow = null;
 
     ImagePattern foodP = new ImagePattern(new Image("file:media/Snake/food.PNG"));
     ImagePattern snakeP = new ImagePattern(new Image("file:media/Snake/tail.PNG"));
@@ -407,6 +408,8 @@ public class Snake {
             superFood.delete();
             superFood = null;
         }
+        gameOverWindow = new sGameOverWindow(snakeMenu);
+        gameOverWindow.open();
         czas=1;
     }
 }
