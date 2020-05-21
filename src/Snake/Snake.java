@@ -46,9 +46,12 @@ public class Snake {
     public int lastX;
     public int lastY;
     public char DIRECTION='0';
-    private SnakeMenu snakeMenu;
+    public char lastDIRECTION='0';
+    public SnakeMenu snakeMenu;
     Scene scene;
     public Stage gameStage;
+
+    private sGamePauseWindow gamePauseWindow = null;
 
     ImagePattern foodP = new ImagePattern(new Image("file:media/Snake/food.PNG"));
     ImagePattern snakeP = new ImagePattern(new Image("file:media/Snake/tail.PNG"));
@@ -80,7 +83,7 @@ public class Snake {
         gameStage.setTitle("Snake");
         gameStage.setScene(scene);
         gameStage.centerOnScreen();
-        gameStage.setResizable(true);
+        gameStage.setResizable(false);
         gameStage.show();
         //zeby w EH uruchomic timeline
         dziala=false;
@@ -112,7 +115,7 @@ public class Snake {
                     dziala=true;
                     timeline.play();
                 }
-                if (wcisnieto.getCode() == KeyCode.P) gamePause();
+                if (wcisnieto.getCode() == KeyCode.P||wcisnieto.getCode() == KeyCode.SPACE) gamePause();
                 else if(wejscie) {
                     if (wcisnieto.getCode() == KeyCode.UP || wcisnieto.getCode() == KeyCode.W) {
                         if (DIRECTION != 's') DIRECTION = 'w'; wejscie=false;
@@ -384,18 +387,26 @@ public class Snake {
     }
 
     public void gamePause(){
+        lastDIRECTION=DIRECTION;
         DIRECTION='0';
         dziala=false;
         timeline.stop();
+        if(!over) {
+            if (gamePauseWindow == null) {
+                gamePauseWindow = new sGamePauseWindow(snakeMenu);
+            }
+            gamePauseWindow.open(lastDIRECTION);
+            System.out.println("open");
+        }
     }
 
     public void gameOver(){
+        over=true;
         gamePause();
         if(superFood!=null) {
             superFood.delete();
             superFood = null;
         }
-        over=true;
         czas=1;
     }
 }
