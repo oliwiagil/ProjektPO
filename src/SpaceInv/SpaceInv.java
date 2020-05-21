@@ -937,6 +937,12 @@ public class SpaceInv {
 
     public void gamePause() {
         if(!pause){
+            //inaczej gdyby przed wcisnieciem pauzy statek poruszal sie w lewo to po powrocie do gry nadal by tak robil
+            //i nie daloby sie tego zmienic
+            left=false;
+            right=false;
+            space=false;
+
             pause=true;
             timeline.stop();
             if(gamePauseWindow == null){
