@@ -54,6 +54,8 @@ public class sSettings {
         lblDiff.setLabelFor(chbDiff);
         lblDiff.setMnemonicParsing(true);
 
+        CheckBox checkBox = new CheckBox("Play with walls");
+
         Button btnBack = new Button("Back");
         btnBack.setOnAction((event) ->{
             settings.close();
@@ -67,14 +69,15 @@ public class sSettings {
             if(chbDiff.getValue() != null){ diff = chbDiff.getValue().toString(); }
             else{ diff = null; }
 
-            applyChanges(diff);
+            applyChanges(diff,checkBox.isSelected());
             snakeMenu.game = null;
         });
 
         grid.add(lblDiff, 0, 0);
         grid.add(chbDiff, 2, 0);
-        grid.add(btnBack, 0, 2);
-        grid.add(btnStart, 2, 2);
+        grid.add(checkBox, 0, 2);
+        grid.add(btnBack, 0, 4);
+        grid.add(btnStart, 2, 4);
 
         scene = new Scene(grid);
 
@@ -83,7 +86,7 @@ public class sSettings {
         stage.setResizable(false);
     }
 
-    private void applyChanges(String diff){
+    private void applyChanges(String diff,boolean tryb){
 
         File fl = new File("settings/Snake.cfg");
 
@@ -105,6 +108,8 @@ public class sSettings {
             else{
                 pw.println("difficulty="+"NORMAL");
             }
+            if(tryb){pw.println("tryb="+"walls");}
+            else{pw.println("tryb="+"normal");}
 
         } catch( Exception e){
             System.out.println(e);
