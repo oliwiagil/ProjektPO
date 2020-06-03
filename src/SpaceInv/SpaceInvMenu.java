@@ -20,6 +20,7 @@ public class SpaceInvMenu {
     MainMenu mainMenu = null;
     SpaceInv game = null;
     Settings settings = null;
+    Scores scores = null;
 
 
     Pane pane = null;
@@ -39,6 +40,7 @@ public class SpaceInvMenu {
     }
 
     public void open(){
+
         stage.show();
     }
 
@@ -102,6 +104,11 @@ public class SpaceInvMenu {
             Button btnScores = new Button("Scores");
             btnScores.setPrefWidth(btnWidth);
             btnScores.setMinWidth(btnWidth);
+            btnScores.setOnAction(ActionEvent ->{
+                scores = new Scores(spaceInvMenu);
+                scores.open();
+                spaceInvMenu.close();
+            });
 
             //Back Button //-------------------------------------------------
             Button btnBack = new Button("Back");
