@@ -34,6 +34,7 @@ public class Snake {
     public boolean dziala;
     boolean over;
     public boolean wejscie;
+    int tryb;
 
     Food food;
     SuperFood superFood;
@@ -57,6 +58,7 @@ public class Snake {
     private sGameOverWindow gameOverWindow = null;
 
     ImagePattern foodP = new ImagePattern(new Image("file:media/Snake/food.PNG"));
+    ImagePattern foodS = new ImagePattern(new Image("file:media/Snake/superfood.PNG"));
     ImagePattern snakeP = new ImagePattern(new Image("file:media/Snake/tail.PNG"));
   //  ImagePattern headP = new ImagePattern(new Image("file:media/Snake/head.PNG"));
     ImagePattern headW = new ImagePattern(new Image("file:media/Snake/headW.PNG"));
@@ -67,6 +69,7 @@ public class Snake {
     public Snake(SnakeMenu menu){
         gameStage = new Stage();
         snakeMenu = menu;
+        //tryb=1;
 
         //Read settings from file.cfg and set all variables
         try(Scanner in = new Scanner(Paths.get("settings/Snake.cfg"))){
@@ -88,10 +91,23 @@ public class Snake {
                             break;
                     }
                 }
+                else{
+                    if("tryb".equals(temp1)){
+                        switch(temp2){
+                            case "normal":
+                                tryb=0;
+                                break;
+                            case "walls":
+                                tryb=1;
+                                break;
+                        }
+                    }
+                }
             }
         } catch(Exception e){
             System.out.println(e);
             SPEED=200;
+            tryb=0;
         }
 
         TLO=Color.YELLOWGREEN;
@@ -170,7 +186,26 @@ public class Snake {
             }
         }
 
-           gameGrid.setGridLinesVisible(true);
+        gameGrid.setGridLinesVisible(true);
+
+        if(tryb==1){
+            int x;
+            int y=4;
+            Rectangle a[]=new Rectangle[10];
+            for(int i=0;i<10;i++) {
+                a[i]=new Rectangle(2*WYMIAR,2*WYMIAR, Color.BLACK);
+            }
+
+            for(x=5;x<10;x++) {
+                GridPane.setConstraints(a[x-5], x, y);
+                gamePane.getChildren().add(a[x-5]);
+            }
+            y=10;
+            for(x=5;x<10;x++) {
+                GridPane.setConstraints(a[x], x, y);
+                gamePane.getChildren().add(a[x]);
+            }
+        }
     }
 
     void uplywczasu(){
@@ -303,7 +338,8 @@ public class Snake {
                 y = random.nextInt(HEI);
             } while(waz.checkZderzenie(x,y)||(x==waz.x&&y==waz.y)||(x==food.x&&y==food.y));
 
-            foodSq=new Rectangle(2*WYMIAR,2*WYMIAR,Color.YELLOW);
+            foodSq=new Rectangle(2*WYMIAR,2*WYMIAR);
+            foodSq.setFill(foodS);
             GridPane.setConstraints(foodSq, x, y);
             gamePane.getChildren().add(foodSq);
             superFood =this;
@@ -410,6 +446,13 @@ public class Snake {
                     //sluzy do wykrycia bledow w powstawianiu jedzenia
                     System.out.println("Zderzono z  "+i);
                     return true;
+                }
+                if(tryb==1) {
+                    if (Y == 4 || Y == 10) {
+                        if (X > 4 && X < 10) {
+                            return true;
+                        }
+                    }
                 }
             }
             return false;
