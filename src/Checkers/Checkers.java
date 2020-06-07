@@ -146,7 +146,20 @@ public class Checkers {
         whosMove = new Label();
         whosMove.setFont(Font.font("Calibri", 15));
 
-        Button btnBack = new Button("Back");
+        VBox vBoxInfo = new VBox();
+
+        Label playerWhite = new Label("Player white: " + whitePlayerName);
+        Label whiteTime = new Label("Time: ");
+        Label playerBlack = new Label("Player black: " + blackPlayerName);
+        Label blackTime = new Label("Time: ");
+
+        vBoxInfo.getChildren().addAll(whosMove, playerWhite, whiteTime, playerBlack, blackTime);
+        vBoxInfo.setSpacing(10);
+
+        Label pause = new Label("P - pause game.");
+        HBox hBoxBottom = new HBox();
+
+        Button btnBack = new Button("Exit");
         btnBack.setPadding(new Insets(10));
         btnBack.setOnAction((event)->{
             returnMenu.open();
@@ -154,8 +167,11 @@ public class Checkers {
             returnMenu.game = null;
         });
 
-        borderPane.setTop(whosMove);
-        borderPane.setBottom(btnBack);
+        hBoxBottom.getChildren().addAll(btnBack, pause);
+        hBoxBottom.setSpacing(10);
+
+        borderPane.setTop(vBoxInfo);
+        borderPane.setBottom(hBoxBottom);
         borderPane.setCenter(winner);
         borderPane.setPrefWidth(250);
         borderPane.setMaxWidth(250);
@@ -1164,7 +1180,6 @@ public class Checkers {
         turn = !turn;
         setWhoseMove();
         check.set(false);
-        showBoard();
     }
 
     private void eraseEnemy(int x, int y){
