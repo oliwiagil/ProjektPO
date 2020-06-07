@@ -298,6 +298,13 @@ public class Snake {
                 y = random.nextInt(HEI);
             } while(y==waz.y);
 
+            if(tryb==1) {
+                while ((y== 4||y==10)&&(x> 4) && (x < 10)) {
+                    x=random.nextInt(WID);
+                    y=random.nextInt(HEI);
+                }
+            }
+
             foodSq=new Rectangle(2*WYMIAR,2*WYMIAR,Color.YELLOW);
             foodSq.setFill(foodP);
             GridPane.setConstraints(foodSq, x, y);
