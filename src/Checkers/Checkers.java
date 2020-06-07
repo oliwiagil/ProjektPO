@@ -12,6 +12,8 @@ import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -92,6 +94,11 @@ public class Checkers {
     Checkers(CheckersMenu cM){
         returnMenu = cM;
         gameStage = new Stage();
+        gameStage.addEventHandler(KeyEvent.KEY_PRESSED, (event)->{
+            if(event.getCode() == KeyCode.P){
+                gamePause();
+            }
+        });
 
         if(returnMenu.settings.firstStyle){
             blackField = new ImagePattern(new Image("file:media/Checkers/blackField.png"));
@@ -104,14 +111,19 @@ public class Checkers {
         this.whitePlayerName = returnMenu.settings.whitePlayerName;
         this.blackPlayerName = returnMenu.settings.blackPlayerName;
 
-        if(returnMenu.settings.min.equals("5 min")){
+        if(returnMenu.settings.min instanceof String) {
+            if (returnMenu.settings.min.equals("5 min")) {
+                time = 5;
+            } else if (returnMenu.settings.min.equals("10 min")) {
+                time = 10;
+            } else if (returnMenu.settings.min.equals("15 min")) {
+                time = 15;
+            } else if (returnMenu.settings.min.equals("30 min")) {
+                time = 30;
+            }
+        }
+        else{
             time = 5;
-        } else if(returnMenu.settings.min.equals("10 min")){
-            time = 10;
-        } else if(returnMenu.settings.min.equals("15 min")){
-            time = 15;
-        } else if(returnMenu.settings.min.equals("30 min")){
-            time = 30;
         }
 
         setEffects();
@@ -200,7 +212,8 @@ public class Checkers {
     //wywołujemy gdy chcemy zapauzować grę
 
     public void gamePause() {
-
+        pauseWindow = new PauseWindow(returnMenu);
+        pauseWindow.open();
     }
 
     private void start(){

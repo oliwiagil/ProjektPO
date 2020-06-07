@@ -56,7 +56,7 @@ public class ResultWindow extends Stage {
         Label txt = new Label();
         txt.setText("Player " + checkersMenu.game.winnedPlayer + " has won!");
         txt.setTextAlignment(TextAlignment.CENTER);
-        txt.setFont(Font.font("Serif", 20));
+        txt.setFont(Font.font("Serif", 15));
 
         pane = new GridPane();
         pane.setAlignment(Pos.CENTER);

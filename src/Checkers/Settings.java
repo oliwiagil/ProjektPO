@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -57,6 +58,9 @@ public class Settings {
         Label blackPlayer = new Label("Black player name: ");
         Label timeLbl = new Label("Time for player: ");
 
+        Label warning = new Label("Name must not have ' '.");
+        warning.setFont(Font.font("Serif", 11));
+
         TextField whiteTxt = new TextField("White");
         TextField blackTxt = new TextField("Black");
 
@@ -92,29 +96,34 @@ public class Settings {
 
         Button btnStart = new Button("Start");
         btnStart.setOnAction((event)->{
-            whitePlayerName = whiteTxt.getText();
-            blackPlayerName = blackTxt.getText();
-            if(firstRB.isSelected()) firstStyle = true;
-            else firstStyle = false;
-            min = (String)chB.getValue();
-            checkersMenu.startGame();
-            settings.close();
+            if((whiteTxt.getCharacters().length() > 0) && !isSpace(whiteTxt.getCharacters()) &&
+                    (blackTxt.getCharacters().length() > 0) && !isSpace(blackTxt.getCharacters())) {
+                whitePlayerName = whiteTxt.getText();
+                blackPlayerName = blackTxt.getText();
+                if (firstRB.isSelected()) firstStyle = true;
+                else firstStyle = false;
+                min = (String) chB.getValue();
+                checkersMenu.startGame();
+                settings.close();
+            }
         });
+
 
 
         grid.add(whitePlayer, 0, 0, 2, 1);
         grid.add(blackPlayer, 0, 1, 2, 1);
         grid.add(whiteTxt, 2, 0, 2, 1);
         grid.add(blackTxt, 2, 1, 2, 1);
-        grid.add(lblStyle, 0, 2, 3, 1);
-        grid.add(first, 0, 3);
-        grid.add(second, 0, 4);
-        grid.add(firstRB, 1, 3);
-        grid.add(secondRB, 1, 4);
-        grid.add(timeLbl, 0, 5, 2, 1);
-        grid.add(chB, 2, 5, 2, 1);
-        grid.add(btnBack, 0, 6);
-        grid.add(btnStart, 5, 6);
+        grid.add(warning, 0, 2, 3, 1);
+        grid.add(lblStyle, 0, 3, 3, 1);
+        grid.add(first, 0, 4);
+        grid.add(second, 0, 5);
+        grid.add(firstRB, 1, 4);
+        grid.add(secondRB, 1, 5);
+        grid.add(timeLbl, 0, 6, 2, 1);
+        grid.add(chB, 2, 6, 2, 1);
+        grid.add(btnBack, 0, 7);
+        grid.add(btnStart, 5, 7);
 
         scene = new Scene(grid);
 
@@ -168,6 +177,16 @@ public class Settings {
             System.out.println(e);
             System.out.println("File: Settings.java");
         }
+    }
+
+    private boolean isSpace(CharSequence charName){
+        boolean var = false;
+
+        for(int i = 0; i<charName.length(); i++){
+            if(charName.charAt(i) == ' ') var = true;
+        }
+
+        return var;
     }
 
 }

@@ -19,6 +19,7 @@ public class CheckersMenu{
     MainMenu mainMenu = null;
     Checkers game = null;
     Settings settings = null;
+    Scores scores = null;
 
     Stage stage;
     Pane pane;
@@ -30,7 +31,6 @@ public class CheckersMenu{
 
         mainMenu = mM;
         checkersMenu = this;
-
         createWindow();
     }
 
@@ -93,7 +93,9 @@ public class CheckersMenu{
 
             Button btnScores = new Button("Scores");
             btnScores.setOnAction(ActionEvent ->{
-
+                scores = new Scores(checkersMenu);
+                scores.open();
+                checkersMenu.close();
             });
             btnScores.setPrefWidth(btnWidth);
             btnScores.setMinWidth(btnWidth);
