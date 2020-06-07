@@ -27,6 +27,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -45,6 +47,9 @@ public class Checkers {
     protected Pane gamePane;
     protected Timeline timeline;
     protected CheckersMenu returnMenu;
+
+    private Timeline whiteTime;
+    private Timeline blackTime;
 
     Scene scene;
     double pawnOrgX, pawnOrgY;
@@ -68,7 +73,7 @@ public class Checkers {
     //Effects
     private DropShadow glow;
 
-    private boolean turn; //true - white, false - black
+    boolean turn; //true - white, false - black
     AtomicBoolean check = new AtomicBoolean(false); // true - informs whether it gives an effect and prepared board for next move of player
     private Field[][] fields;
     private ArrayList<Pawn> blackPawns;
@@ -89,6 +94,9 @@ public class Checkers {
 
     private ResultWindow resultWindow;
     private PauseWindow pauseWindow;
+
+    Clock whiteClock;
+    Clock blackClock;
 
     //konstruktor, tutaj tworzymy grę: jej stage(każdy obiekt gry ma swój), scene, i jakieś zmienne potrzebne
     Checkers(CheckersMenu cM){
@@ -149,9 +157,9 @@ public class Checkers {
         VBox vBoxInfo = new VBox();
 
         Label playerWhite = new Label("Player white: " + whitePlayerName);
-        Label whiteTime = new Label("Time: ");
+        Label whiteTime = new Label("Time: " + time);
         Label playerBlack = new Label("Player black: " + blackPlayerName);
-        Label blackTime = new Label("Time: ");
+        Label blackTime = new Label("Time: " + time);
 
         vBoxInfo.getChildren().addAll(whosMove, playerWhite, whiteTime, playerBlack, blackTime);
         vBoxInfo.setSpacing(10);
@@ -181,6 +189,9 @@ public class Checkers {
         HBox hBox = new HBox();
         hBox.getChildren().addAll(gamePane, borderPane);
         hBox.setSpacing(10);
+
+        whiteClock = new Clock(time, whiteTime, this);
+        blackClock = new Clock(time, blackTime, this);
 
         scene = new Scene(hBox);
         gameStage.setTitle("Checkers");
@@ -230,6 +241,22 @@ public class Checkers {
     public void gamePause() {
         pauseWindow = new PauseWindow(returnMenu);
         pauseWindow.open();
+        if(turn){
+            whiteClock.stop();
+        } else{
+            blackClock.stop();
+        }
+    }
+
+    void gameEndTime(){
+        blackClock.stop();
+        whiteClock.stop();
+        if(blackClock.isEnd()){
+            whiteWin();
+        }
+        else{
+            blackWin();
+        }
     }
 
     private void start(){
@@ -282,6 +309,7 @@ public class Checkers {
                             }
                 }));
         timeline.setCycleCount(Animation.INDEFINITE);
+        whiteClock.start();
         setWhoseMove();
         timeline.play();
     }
@@ -291,6 +319,8 @@ public class Checkers {
         winnedPlayer = blackPlayerName;
         lostPlayer = whitePlayerName;
         timeline.stop();
+        blackClock.stop();
+        whiteClock.stop();
         if(resultWindow == null) resultWindow = new ResultWindow(returnMenu);
         resultWindow.open();
     }
@@ -300,6 +330,8 @@ public class Checkers {
         winnedPlayer = whitePlayerName;
         lostPlayer = blackPlayerName;
         timeline.stop();
+        blackClock.stop();
+        whiteClock.stop();
         if(resultWindow == null) resultWindow = new ResultWindow(returnMenu);
         resultWindow.open();
     }
@@ -1177,6 +1209,13 @@ public class Checkers {
         }
         effectOnField.clear();
         effectOnPawn.clear();
+        if(turn){
+            whiteClock.stop();
+            blackClock.start();
+        } else{
+            whiteClock.start();
+            blackClock.stop();
+        }
         turn = !turn;
         setWhoseMove();
         check.set(false);

@@ -67,18 +67,26 @@ public class PauseWindow {
 
 
             Button btnBack = new Button("Back to Game");
+
             btnBack.setOnAction(event ->{
                 pauseWindow.close();
                 game.gameStage.toFront();
                 game.pause=false;
                 game.timeline.play();
+                if(game.turn){
+                    game.whiteClock.start();
+                } else game.blackClock.start();
             });
+
             btnBack.setOnKeyPressed((KeyEvent)->{
                 if(KeyEvent.getCode() == KeyCode.P){
                     pauseWindow.close();
                     game.gameStage.toFront();
                     game.pause=false;
                     game.timeline.play();
+                    if(game.turn){
+                        game.whiteClock.start();
+                    } else game.blackClock.start();
                 }
             });
 
