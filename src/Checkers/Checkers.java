@@ -38,6 +38,7 @@ public class Checkers {
     public boolean fullScreen;
 
     public Stage gameStage;
+    public boolean pause;
     protected int SPEED;
     protected Pane gamePane;
     protected Timeline timeline;
@@ -53,6 +54,14 @@ public class Checkers {
     private final int frameWidth = 10;
     private final int pawnRadius = 25;
     private int[][] array; //[x][y]
+
+    public String winnedPlayer;
+    public String lostPlayer;
+
+    private String whitePlayerName;
+    private String blackPlayerName;
+
+    private int time;
 
     //Effects
     private DropShadow glow;
@@ -73,13 +82,37 @@ public class Checkers {
     private Image whitePawn = new Image("file:media/Checkers/whitePawn.png");
     private Image blackPawnHetman = new Image("file:media/Checkers/blackPawnHetman.png");
     private Image whitePawnHetman = new Image("file:media/Checkers/whitePawnHetman.png");
-    private ImagePattern blackField = new ImagePattern(new Image("file:media/Checkers/blackField.png"));
-    private ImagePattern whiteField = new ImagePattern(new Image("file:media/Checkers/whiteField.png"));
+    private ImagePattern blackField;
+    private ImagePattern whiteField;
+
+    private ResultWindow resultWindow;
+    private PauseWindow pauseWindow;
 
     //konstruktor, tutaj tworzymy grę: jej stage(każdy obiekt gry ma swój), scene, i jakieś zmienne potrzebne
     Checkers(CheckersMenu cM){
         returnMenu = cM;
         gameStage = new Stage();
+
+        if(returnMenu.settings.firstStyle){
+            blackField = new ImagePattern(new Image("file:media/Checkers/blackField.png"));
+            whiteField = new ImagePattern(new Image("file:media/Checkers/whiteField.png"));
+        } else{
+            blackField = new ImagePattern(new Image("file:media/Checkers/blackField2.png"));
+            whiteField = new ImagePattern(new Image("file:media/Checkers/whiteField2.png"));
+        }
+
+        this.whitePlayerName = returnMenu.settings.whitePlayerName;
+        this.blackPlayerName = returnMenu.settings.blackPlayerName;
+
+        if(returnMenu.settings.min.equals("5 min")){
+            time = 5;
+        } else if(returnMenu.settings.min.equals("10 min")){
+            time = 10;
+        } else if(returnMenu.settings.min.equals("15 min")){
+            time = 15;
+        } else if(returnMenu.settings.min.equals("30 min")){
+            time = 30;
+        }
 
         setEffects();
         SPEED = 50;
@@ -91,7 +124,7 @@ public class Checkers {
         effectOnPawn = new ArrayList<>();
         turn = true;
         gamePane = performBoard();
-        gamePane.setPadding(new Insets(10));
+        gamePane.setPadding(new Insets(5));
 
         BorderPane borderPane = new BorderPane();
 
@@ -115,7 +148,7 @@ public class Checkers {
         borderPane.setPrefWidth(250);
         borderPane.setMaxWidth(250);
         borderPane.setMinWidth(250);
-        borderPane.setPadding(new Insets(20));
+        borderPane.setPadding(new Insets(10));
 
         HBox hBox = new HBox();
         hBox.getChildren().addAll(gamePane, borderPane);
@@ -131,6 +164,10 @@ public class Checkers {
             whosMove.setText("Move has: White");
         }
         else whosMove.setText("Move has: Black");
+    }
+
+    public void close(){
+        gameStage.close();
     }
 
     //odpalamy grę, pokazujemy stage i włączamy czas
@@ -184,6 +221,13 @@ public class Checkers {
                                     }
                                     else if (checkAndSetMove(true)) {
                                         check.set(true);
+                                    } else{
+                                        if(blackWins()){
+                                            blackWin();
+                                        } else{
+                                            whiteWin();
+                                        }
+                                        check.set(true);
                                     }
                                 }
                             }
@@ -197,6 +241,13 @@ public class Checkers {
                                     }
                                     else if (checkAndSetMove(false)) {
                                         check.set(true);
+                                    }else{
+                                        if(blackWins()){
+                                            blackWin();
+                                        } else{
+                                            whiteWin();
+                                        }
+                                        check.set(true);
                                     }
                                 }
                             }
@@ -208,12 +259,32 @@ public class Checkers {
 
     private void blackWin(){
         winner.setText("Black has won!");
+        winnedPlayer = blackPlayerName;
+        lostPlayer = whitePlayerName;
         timeline.stop();
+        if(resultWindow == null) resultWindow = new ResultWindow(returnMenu);
+        resultWindow.open();
     }
 
     private  void whiteWin(){
         winner.setText("White has won!");
+        winnedPlayer = whitePlayerName;
+        lostPlayer = blackPlayerName;
         timeline.stop();
+        if(resultWindow == null) resultWindow = new ResultWindow(returnMenu);
+        resultWindow.open();
+    }
+
+    private boolean blackWins(){
+
+        int b = 0, w = 0;
+        for(Pawn p: blackPawns){
+            if(!p.isErased()) b++;
+        }
+        for(Pawn p: whitePawns){
+            if(!p.isErased()) w++;
+        }
+        return b>w;
     }
 
     private boolean checkWhiteWin(){
@@ -241,6 +312,70 @@ public class Checkers {
                 int x = p.getArrX();
                 int y = p.getArrY();
 
+                if(p.isHetman()){
+                    if (y != 0) {
+                        if (x > 0 && x < 7) {
+                            if (array[x - 1][y - 1] == 0 || array[x + 1][y - 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            } else if (array[x - 1][y + 1] == 0 || array[x + 1][y + 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            }
+                        } else if (x == 0) {
+                            if (array[x + 1][y - 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            } else if (array[x + 1][y + 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            }
+                        } else {
+                            if (array[x - 1][y - 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            } else if (array[x - 1][y + 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            }
+                        }
+                    } else {
+                        if (x > 0 && x < 7) {
+                            if (array[x - 1][y + 1] == 0 || array[x + 1][y + 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            }
+                        } else if (x == 0) {
+                            if (array[x + 1][y + 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            }
+                        } else {
+                            if (array[x - 1][y + 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            }
+                        }
+                    }
+                } else {
                     if (y != 0) {
                         if (x > 0 && x < 7) {
                             if (array[x - 1][y - 1] == 0 || array[x + 1][y - 1] == 0) {
@@ -267,6 +402,7 @@ public class Checkers {
                     } else {
 
                     }
+                }
             }
         }
         else{
@@ -274,6 +410,70 @@ public class Checkers {
                 int x = p.getArrX();
                 int y = p.getArrY();
 
+                if(p.isHetman()){
+                    if (y != 7) {
+                        if (x > 0 && x < 7) {
+                            if (array[x - 1][y + 1] == 0 || array[x + 1][y + 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            } else if (array[x - 1][y - 1] == 0 || array[x + 1][y - 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            }
+                        } else if (x == 0) {
+                            if (array[x + 1][y + 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            } else if (array[x + 1][y - 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            }
+                        } else {
+                            if (array[x - 1][y + 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            } else if (array[x - 1][y - 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            }
+                        }
+                    } else {
+                        if (x > 0 && x < 7) {
+                            if (array[x - 1][y - 1] == 0 || array[x + 1][y - 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            }
+                        } else if (x == 0) {
+                            if (array[x + 1][y - 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            }
+                        } else {
+                            if (array[x - 1][y - 1] == 0) {
+                                var = true;
+                                p.setEffect(glow);
+                                effectOnPawn.add(p);
+                                p.setCanBeMoved(true);
+                            }
+                        }
+                    }
+                } else {
                     if (y != 7) {
                         if (x > 0 && x < 7) {
                             if (array[x - 1][y + 1] == 0 || array[x + 1][y + 1] == 0) {
@@ -300,9 +500,9 @@ public class Checkers {
                     } else {
 
                     }
+                }
             }
         }
-
         return var;
     }
 
@@ -658,7 +858,11 @@ public class Checkers {
                 int ix = (int) (centerX / squareSize);
                 int iy = (int) (centerY / squareSize);
 
-                if(fields[ix][iy].isCanBePositioned()) {
+                if(!(ix>=0 && ix<=7 && iy>=0 && iy<=7)){
+                    array[((Pawn) (mouseEvent.getSource())).getArrX()][((Pawn) (mouseEvent.getSource())).getArrY()] = ((Pawn) (mouseEvent.getSource())).getColor();
+                    ((Pawn) (mouseEvent.getSource())).setTranslateX(translateX);
+                    ((Pawn) (mouseEvent.getSource())).setTranslateY(translateY);
+                } else if(fields[ix][iy].isCanBePositioned()) {
 
                     array[ix][iy] = ((Pawn) (mouseEvent.getSource())).getColor();
 
@@ -697,15 +901,12 @@ public class Checkers {
                 int ix = (int) (centerX / squareSize);
                 int iy = (int) (centerY / squareSize);
 
-                if(fields[ix][iy].isCanBePositioned()) {
+                if(!(ix>=0 && ix<=7 && iy>=0 && iy<=7)){
+                    ((Pawn) (mouseEvent.getSource())).setTranslateX(translateX);
+                    ((Pawn) (mouseEvent.getSource())).setTranslateY(translateY);
+                } else if(fields[ix][iy].isCanBePositioned()) {
 
                     array[ix][iy] = ((Pawn) (mouseEvent.getSource())).getColor();
-
-                    if(iy == 0 && ((Pawn) (mouseEvent.getSource())).getColor() == 1){
-                        makeHetman(((Pawn) (mouseEvent.getSource())));
-                    } else if(iy == 7 && ((Pawn) (mouseEvent.getSource())).getColor() == 2) {
-                        makeHetman(((Pawn) (mouseEvent.getSource())));
-                    }
                     
                     int begX = ((Pawn) (mouseEvent.getSource())).getArrX();
                     int begY = ((Pawn) (mouseEvent.getSource())).getArrY();
@@ -733,6 +934,19 @@ public class Checkers {
                     if(!checkHit((Pawn) (mouseEvent.getSource()))){
                         endOfPlayerTurn();
                     }
+
+                    if(!(((Pawn) (mouseEvent.getSource())).isHetman())) {
+                        if (iy == 0 && ((Pawn) (mouseEvent.getSource())).getColor() == 1) {
+                            makeHetman(((Pawn) (mouseEvent.getSource())));
+                        } else if (iy == 7 && ((Pawn) (mouseEvent.getSource())).getColor() == 2) {
+                            makeHetman(((Pawn) (mouseEvent.getSource())));
+                        }
+                    }
+
+                    for(Field f: effectOnField){
+                        f.setCanBePositioned(false);
+                        f.setEffect(null);
+                    }
                 }
                 else{
                     //array[ix][iy] = 0;
@@ -743,6 +957,25 @@ public class Checkers {
             }
         }
     };
+
+    private void showBoard(){
+        for(int i = 0; i<8; i++){
+            System.out.print("| ");
+            for(int j = 0; j<8; j++){
+                System.out.print(array[j][i]);
+                System.out.print(" |");
+            }
+            System.out.println("");
+            for(int j = 0; j<8;j++){
+                System.out.print("___");
+            }
+            System.out.println("");
+        }
+        for(int j = 0; j<8;j++){
+            System.out.print("***");
+        }
+        System.out.println("");
+    }
 
     private void setEffects(){
         glow = new DropShadow(15, Color.GOLD);
@@ -918,6 +1151,7 @@ public class Checkers {
         turn = !turn;
         setWhoseMove();
         check.set(false);
+        showBoard();
     }
 
     private void eraseEnemy(int x, int y){
@@ -939,15 +1173,26 @@ public class Checkers {
     }
 
     private boolean checkHit(Pawn p){
-        ArrayList<Point> arrL = new ArrayList<>();
-        if(hitTopRight(p, p.getArrX(), p.getArrY(), arrL) || hitTopLeft(p, p.getArrX(), p.getArrY(), arrL) ||
-                hitBotRight(p, p.getArrX(), p.getArrY(), arrL) ||hitBotLeft(p, p.getArrX(), p.getArrY(), arrL)){
-            p.setEffect(glow);
-            effectOnPawn.add(p);
-            p.setCanHit(true);
-            return true;
+        if(!p.isHetman()) {
+            ArrayList<Point> arrL = new ArrayList<>();
+            if (hitTopRight(p, p.getArrX(), p.getArrY(), arrL) || hitTopLeft(p, p.getArrX(), p.getArrY(), arrL) ||
+                    hitBotRight(p, p.getArrX(), p.getArrY(), arrL) || hitBotLeft(p, p.getArrX(), p.getArrY(), arrL)) {
+                p.setEffect(glow);
+                effectOnPawn.add(p);
+                p.setCanHit(true);
+                return true;
+            }
+            return false;
+        } else {
+            if (hitTopRightHetman(p, p.getArrX(), p.getArrY()) || hitTopLeftHetman(p, p.getArrX(), p.getArrY()) ||
+                    hitBotRightHetman(p, p.getArrX(), p.getArrY()) || hitBotLeftHetman(p, p.getArrX(), p.getArrY())) {
+                p.setEffect(glow);
+                effectOnPawn.add(p);
+                p.setCanHit(true);
+                return true;
+            }
+            return false;
         }
-        return false;
     }
 
     private void makeHetman(Pawn p){

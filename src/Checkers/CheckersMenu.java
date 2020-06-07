@@ -18,12 +18,13 @@ public class CheckersMenu{
     CheckersMenu checkersMenu = null;
     MainMenu mainMenu = null;
     Checkers game = null;
+    Settings settings = null;
 
     Stage stage;
     Pane pane;
     Scene scene;
 
-    final int height = 250, width = 200;
+    final int height = 200, width = 200;
 
     public CheckersMenu(MainMenu mM){
 
@@ -42,9 +43,10 @@ public class CheckersMenu{
     }
 
     public void startGame(){
+        game = null;
         System.gc();
         try{
-            if(game == null){ game = new Checkers(checkersMenu); }
+            game = new Checkers(checkersMenu);
             game.resetGame();
             game.startGame();
         } catch (Exception e) {
@@ -82,7 +84,9 @@ public class CheckersMenu{
 
             Button btnStart = new Button("Start");
             btnStart.setOnAction(ActionEvent->{
-                startGame();
+                if(settings == null) settings = new Settings(checkersMenu);
+                settings.open();
+                checkersMenu.close();
             });
             btnStart.setPrefWidth(btnWidth);
             btnStart.setMinWidth(btnWidth);
