@@ -151,7 +151,11 @@ public class Snake {
         eventHandler = new EventHandler<>() {
             @Override
             public void handle(KeyEvent wcisnieto) {
-                if(wcisnieto.getCode()==KeyCode.ESCAPE){System.exit(0);}
+                if(wcisnieto.getCode()==KeyCode.ESCAPE){
+                   gameStage.close();
+                   snakeMenu.open();
+                   snakeMenu.game = null;
+                }
                 //albo pausa albo gra zostala przegrana
                 if(!dziala){
                     if(over){
