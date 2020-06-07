@@ -24,7 +24,7 @@ public class Snake {
     public int WID=15;
     public int HEI =15;
     //polowa szerokosci jednego kwadratu
-    public int WYMIAR=30;
+    public int WYMIAR=28;
     private int SPEED=200;
     //szerokosc i wysokosc ekranu
     public double WIDTH;
@@ -186,7 +186,7 @@ public class Snake {
             }
         }
 
-        gameGrid.setGridLinesVisible(true);
+      //  gameGrid.setGridLinesVisible(true);
 
         if(tryb==1){
             int x;
@@ -221,7 +221,6 @@ public class Snake {
                             //np. bylo s, wciskamy d, nastepnie szybko w i idziemy w nidozwolonym kierunku
 
                             //raz na 35 ruchow pojawia sie superfood
-                            System.out.println(czas+"  "+superFood);
                             if(czas%35==0&&superFood==null){
                                 superFood=new SuperFood();
                                 czas=1;
@@ -383,13 +382,6 @@ public class Snake {
             }
         }
 
-        void wypisz(){
-            System.out.println("START");
-            for(int i=0;i<=size;i++){
-                System.out.println((int) tab[i].getLayoutX()/(2*WYMIAR)+" "+ (int) tab[i].getLayoutY()/(2*WYMIAR));
-            }
-            System.out.println("KONIEC");
-        }
         //przemieszcza calego weza oprocz glowy
         void move(){
             for(int i=size;i>0;i--){
@@ -440,11 +432,7 @@ public class Snake {
 
         boolean checkZderzenie(int X, int Y){
             for(int i=0;i<size;i++){
-                //   System.out.println(lastX+" last y: "+lastY);
-                //   if(X==lastX&&Y==lastY)return false;
                 if(X==tab[i].getLayoutX()/(2*WYMIAR)&&Y==tab[i].getLayoutY()/(2*WYMIAR)) {
-                    //sluzy do wykrycia bledow w powstawianiu jedzenia
-                    System.out.println("Zderzono z  "+i);
                     return true;
                 }
                 if(tryb==1) {
